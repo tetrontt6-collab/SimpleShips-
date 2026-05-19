@@ -266,6 +266,8 @@ Feedback, bug reports, and suggestions are welcome.
 	<img src="screenshots/VikingLongShip.png" width="700">
 </p>
 
+[Going a Viking](videos/GoingAViking.mp4)
+
 <p align="center">
 	<video src="videos/GoingAViking.mp4" controls width="800"></video>
 </p>	
