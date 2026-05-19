@@ -1,0 +1,65 @@
+* Notes
+** Connecting Persistent Properties
+   All ship components will have a property for the key
+   Constants.ITEM_TYPE_KEY in the component's PersistentData settings.
+   
+*** Seats
+    The armor stand (helmAnchor) has these properties
+      - Constants.ITEM_TYPE_KEY = Constants.SHIP_HELM_ITEM_TYPE
+      - Constants.SHIP_HELM_ID_KEY = <the Ship's unique id str>
+
+    The block display for the post has these properties
+      - Constants.ITEM_TYPE_KEY = Constants.SHIP_HELM_POST_TYPE
+      - Constants.SHIP_HELM_ID_KEY = <the Ship's unique id str>
+
+    The block display for the seat has these properties
+      - Constants.ITEM_TYPE_KEY = Constants.SHIP_HELM_SEAT_TYPE
+      - Constants.SHIP_HELM_ID_KEY = <the Ship's unique id str>
+
+*** EntityPad
+    Each EntityPad gets a unique UUID on construction.
+    
+    The armor stand (post) has these properties
+    - Constants.ITEM_TYPE_KEY = Constants.ENTITY_PAD_ITEM_TYPE
+    - Constants.ENTITY_PAD_ID_KEY = uuid
+
+    The block display nest has these properties
+    - Constants.ITEM_TYPE_KEY = Constants.ENTITY_PAD_ITEM_TYPE
+    - Constants.ENTITY_PAD_ID_KEY = uuid
+
+    The interaction has these properties
+    - Constants.ITEM_TYPE_KEY = Constants.ENTITY_PAD_ITEM_TYPE
+    - Constants.ENTITY_PAD_ID_KEY = uuid
+
+*** PassengerSeat
+    Each PassengerSeat gets a unique UUID on construction
+
+    The ArmorStand (stand) has these properties
+    - Constants.ITEM_TYPE_KEY = Constants.PASSENGER_SEAT_ITEM_TYPE
+    - Constants.PASSENGER_SEAT_ID_KEY = uuid
+
+    The BlockDisplay (stair) has these properties
+    - Constants.ITEM_TYPE_KEY = Constants.PASSENGER_SEAT_ITEM_TYPE
+    - Constants.PASSENGER_SEAT_ID_KEY = uuid
+
+    The BlockDisplay (cushion) has these properties 
+    - Constants.ITEM_TYPE_KEY = Constants.PASSENGER_SEAT_ITEM_TYPE
+    - Constants.PASSENGER_SEAT_ID_KEY = uuid
+     
+
+** Summon commands
+*** Summon Seated Armor Stand
+    /summon armor_stand ~ -1 ~ {Rotation:[180.0f, 0.0f],Pose:{Head:[0f,0f,0f],Body:[15f,0f,0f],LeftArm:[0f,0f,0f],RightArm:[0f,0f,0f],LeftLeg:[-90f,0f,0f],RightLeg:[-90f,0f,0f]},NoGravity:1b,ShowArms:1b,NoBasePlate:1b}
+    
+*** Summon Seated Armor Stand while standing on a slab, 
+   /summon armor_stand ~-0.25 ~-.75 ~ {Rotation:[270.0f, 0.0f],Pose:{Head:[0f,0f,0f],Body:[15f,0f,0f],LeftArm:[0f,0f,0f],RightArm:[0f,0f,0f],LeftLeg:[-90f,0f,0f],RightLeg:[-90f,0f,0f]},NoGravity:1b,ShowArms:1b,NoBasePlate:1b}
+
+*** Give Player Head
+    /give @s minecraft:player_head[minecraft:profile={name:"PlayerName"}]   
+
+* Credits
+  [[https://www.youtube.com/watch?v=CMphPC7fyZE][Viking Long Boat]] - ThorHammerhand
+  [[https://www.youtube.com/shorts/Gb3JFwWKpuA][Dragon Banner]] - DCII
+
+
+ 

@@ -1,0 +1,339 @@
+package simpleships;
+/*
+ * SimpleShips
+ * Copyright (c) 2026, Jere McDevitt
+ *
+ * Licensed under the MIT License.
+ * See LICENSE file in the project root for full license information.
+ */
+
+import java.util.HashSet;
+import java.util.Set;
+import org.bukkit.Material;
+import org.bukkit.Tag;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Slab;
+import org.bukkit.inventory.ItemStack;
+
+public class BlockSupport {
+	private static Set<Material> allowedBlocks = new HashSet<>()
+																							 {{
+																									 add(Material.ARMOR_STAND);
+																									 add(Material.BARREL);
+																									 add(Material.CAMPFIRE);
+																									 add(Material.CARTOGRAPHY_TABLE);
+																									 add(Material.CAULDRON);
+																									 add(Material.CHEST);
+																									 add(Material.COMPOSTER);
+																									 add(Material.COPPER_CHEST);
+																									 add(Material.CRAFTER);
+																									 add(Material.CRAFTING_TABLE);
+																									 add(Material.CRAFTING_TABLE);
+																									 add(Material.CREEPER_HEAD);
+																									 add(Material.CREEPER_WALL_HEAD);
+																									 add(Material.DECORATED_POT);
+																									 add(Material.DISPENSER);
+																									 add(Material.DRAGON_HEAD);
+																									 add(Material.DRAGON_WALL_HEAD);
+																									 add(Material.DROPPER);
+																									 add(Material.EMERALD);
+																									 add(Material.ENDER_CHEST);
+																									 add(Material.END_ROD);
+																									 add(Material.FLETCHING_TABLE);
+																									 add(Material.FURNACE);
+																									 add(Material.HAY_BLOCK);
+																									 add(Material.HOPPER);
+																									 add(Material.ITEM_FRAME);
+																									 add(Material.GLOW_ITEM_FRAME);
+																									 add(Material.JACK_O_LANTERN);
+																									 add(Material.JIGSAW);
+																									 add(Material.LADDER);
+																									 add(Material.LECTERN);
+																									 add(Material.LIGHT);
+																									 add(Material.LOOM);
+																									 add(Material.NOTE_BLOCK);
+																									 add(Material.OBSERVER);
+																									 add(Material.OBSIDIAN);
+																									 add(Material.OCHRE_FROGLIGHT);
+																									 add(Material.PAINTING);
+																									 add(Material.PEARLESCENT_FROGLIGHT);
+																									 add(Material.PIGLIN_HEAD);
+																									 add(Material.PIGLIN_WALL_HEAD);
+																									 add(Material.PLAYER_HEAD);
+																									 add(Material.PLAYER_WALL_HEAD);
+																									 add(Material.REDSTONE_BLOCK);
+																									 add(Material.REDSTONE_LAMP);
+																									 add(Material.REDSTONE_TORCH);
+																									 add(Material.REDSTONE_WALL_TORCH);
+																									 add(Material.RED_CONCRETE);
+																									 add(Material.SCAFFOLDING);
+																									 add(Material.SEA_LANTERN);
+																									 add(Material.SKELETON_SKULL);
+																									 add(Material.SKELETON_WALL_SKULL);
+																									 add(Material.SMITHING_TABLE);
+																									 add(Material.SMOKER);
+																									 add(Material.SOUL_CAMPFIRE);
+																									 add(Material.STONECUTTER);
+																									 add(Material.STRING);
+																									 add(Material.TORCH);
+																									 add(Material.TRAPPED_CHEST);
+																									 add(Material.TRIPWIRE);
+																									 add(Material.VERDANT_FROGLIGHT);
+																									 add(Material.WALL_TORCH);
+																									 add(Material.WATER_CAULDRON);
+																									 add(Material.WHITE_CONCRETE);
+																									 add(Material.WITHER_SKELETON_SKULL);
+																									 add(Material.WITHER_SKELETON_WALL_SKULL);
+																									 add(Material.ZOMBIE_HEAD);
+																									 add(Material.ZOMBIE_WALL_HEAD);
+																									 
+
+																									 addAll(Tag.ANVIL.getValues());
+																									 addAll(Tag.ALL_SIGNS.getValues());
+																									 addAll(Tag.BAMBOO_BLOCKS.getValues());
+																									 addAll(Tag.BANNERS.getValues());
+																									 addAll(Tag.BARS.getValues());
+																									 addAll(Tag.BEDS.getValues());
+																									 addAll(Tag.BUTTONS.getValues());
+																									 addAll(Tag.CANDLES.getValues());
+																									 addAll(Tag.CHAINS.getValues());
+																									 addAll(Tag.COPPER.getValues());
+																									 addAll(Tag.DOORS.getValues());
+																									 addAll(Tag.FENCES.getValues());
+																									 addAll(Tag.FENCE_GATES.getValues());
+																									 addAll(Tag.FLOWER_POTS.getValues());
+																									 addAll(Tag.LANTERNS.getValues());
+																									 addAll(Tag.LIGHTNING_RODS.getValues());
+																									 addAll(Tag.LOGS.getValues());
+																									 addAll(Tag.PLANKS.getValues());
+																									 addAll(Tag.STAIRS.getValues());
+																									 addAll(Tag.TERRACOTTA.getValues());
+																									 addAll(Tag.WOODEN_SHELVES.getValues());
+																									 addAll(Tag.WOODEN_SLABS.getValues());
+																									 addAll(Tag.WOODEN_TRAPDOORS.getValues());
+																									 addAll(Tag.WOOL.getValues());
+																									 addAll(Tag.WOOL_CARPETS.getValues());
+																											 
+																								 }};
+
+	private static Set<Material> glassPanes = new HashSet<>()
+																						{{
+																								add(Material.BLACK_STAINED_GLASS_PANE);
+																								add(Material.BLUE_STAINED_GLASS_PANE);
+																								add(Material.BROWN_STAINED_GLASS_PANE);
+																								add(Material.CYAN_STAINED_GLASS_PANE);
+																								add(Material.GRAY_STAINED_GLASS_PANE);
+																								add(Material.GREEN_STAINED_GLASS_PANE);
+																								add(Material.LIGHT_BLUE_STAINED_GLASS_PANE);
+																								add(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+																								add(Material.LIME_STAINED_GLASS_PANE);
+																								add(Material.MAGENTA_STAINED_GLASS_PANE);
+																								add(Material.ORANGE_STAINED_GLASS_PANE);
+																								add(Material.PINK_STAINED_GLASS_PANE);
+																								add(Material.PURPLE_STAINED_GLASS_PANE);
+																								add(Material.RED_STAINED_GLASS_PANE);
+																								add(Material.WHITE_STAINED_GLASS_PANE);
+																								add(Material.YELLOW_STAINED_GLASS_PANE);
+																							}};
+
+	private static Set<Material> glass = new HashSet<>()
+																			 {{
+																					 add(Material.BLACK_STAINED_GLASS);
+																					 add(Material.BLUE_STAINED_GLASS);
+																					 add(Material.BROWN_STAINED_GLASS);
+																					 add(Material.CYAN_STAINED_GLASS);
+																					 add(Material.GRAY_STAINED_GLASS);
+																					 add(Material.GREEN_STAINED_GLASS);
+																					 add(Material.LIGHT_BLUE_STAINED_GLASS);
+																					 add(Material.LIGHT_GRAY_STAINED_GLASS);
+																					 add(Material.LIME_STAINED_GLASS);
+																					 add(Material.MAGENTA_STAINED_GLASS);
+																					 add(Material.ORANGE_STAINED_GLASS);
+																					 add(Material.PINK_STAINED_GLASS);
+																					 add(Material.PURPLE_STAINED_GLASS);
+																					 add(Material.RED_STAINED_GLASS);
+																					 add(Material.WHITE_STAINED_GLASS);
+																					 add(Material.YELLOW_STAINED_GLASS);
+																				 }};
+	private static Set<Material> concrete = new HashSet<>()
+																					{{
+																					 add(Material.BLACK_CONCRETE);
+																					 add(Material.BLUE_CONCRETE);
+																					 add(Material.BROWN_CONCRETE);
+																					 add(Material.CYAN_CONCRETE);
+																					 add(Material.GRAY_CONCRETE);
+																					 add(Material.GREEN_CONCRETE);
+																					 add(Material.LIGHT_BLUE_CONCRETE);
+																					 add(Material.LIGHT_GRAY_CONCRETE);
+																					 add(Material.LIME_CONCRETE);
+																					 add(Material.MAGENTA_CONCRETE);
+																					 add(Material.ORANGE_CONCRETE);
+																					 add(Material.PINK_CONCRETE);
+																					 add(Material.PURPLE_CONCRETE);
+																					 add(Material.RED_CONCRETE);
+																					 add(Material.WHITE_CONCRETE);
+																					 add(Material.YELLOW_CONCRETE);
+																						}};
+
+	private static Set<Material> pottedPlants = new HashSet<>()
+																							{{
+																									add(Material.POTTED_ACACIA_SAPLING);
+																									add(Material.POTTED_ALLIUM);
+																									add(Material.POTTED_AZALEA_BUSH);
+																									add(Material.POTTED_AZURE_BLUET);
+																									add(Material.POTTED_BAMBOO);
+																									add(Material.POTTED_BIRCH_SAPLING);
+																									add(Material.POTTED_BLUE_ORCHID);
+																									add(Material.POTTED_BROWN_MUSHROOM);
+																									add(Material.POTTED_CACTUS);
+																									add(Material.POTTED_CHERRY_SAPLING);
+																									add(Material.POTTED_CLOSED_EYEBLOSSOM);
+																									add(Material.POTTED_CORNFLOWER);
+																									add(Material.POTTED_CRIMSON_FUNGUS);
+																									add(Material.POTTED_CRIMSON_ROOTS);
+																									add(Material.POTTED_DANDELION);
+																									add(Material.POTTED_DARK_OAK_SAPLING);
+																									add(Material.POTTED_DEAD_BUSH);
+																									add(Material.POTTED_FERN);
+																									add(Material.POTTED_FLOWERING_AZALEA_BUSH);
+																									//add(Material.POTTED_GOLDEN_DANDELION);  //It is in the docs
+																									add(Material.POTTED_JUNGLE_SAPLING);
+																									add(Material.POTTED_LILY_OF_THE_VALLEY);
+																									add(Material.POTTED_MANGROVE_PROPAGULE);
+																									add(Material.POTTED_OAK_SAPLING);
+																									add(Material.POTTED_OPEN_EYEBLOSSOM);
+																									add(Material.POTTED_ORANGE_TULIP);
+																									add(Material.POTTED_OXEYE_DAISY);
+																									add(Material.POTTED_PALE_OAK_SAPLING);
+																									add(Material.POTTED_PINK_TULIP);
+																									add(Material.POTTED_POPPY);
+																									add(Material.POTTED_RED_MUSHROOM);
+																									add(Material.POTTED_RED_TULIP);
+																									add(Material.POTTED_SPRUCE_SAPLING);
+																									add(Material.POTTED_TORCHFLOWER);
+																									add(Material.POTTED_WARPED_FUNGUS);
+																									add(Material.POTTED_WARPED_ROOTS);
+																									add(Material.POTTED_WHITE_TULIP);
+																									add(Material.POTTED_WITHER_ROSE);
+																								}};
+
+
+
+	public static final boolean isBlockAllowed(Block block) {
+		if( block == null )
+			return false;
+		return isBlockAllowed(block.getType());
+	}
+	public static final boolean isBlockAllowed(Material mat) {
+		return
+			allowedBlocks.contains(mat) ||
+			glass.contains(mat) ||
+			glassPanes.contains(mat) ||
+			concrete.contains(mat) ||
+			pottedPlants.contains(mat);
+	}
+
+	//apparently there isn't a Tag.WALL_BANNERS
+	public static final boolean isWallBanner(Material mat) {
+		return
+			mat == Material.WHITE_WALL_BANNER ||
+			mat == Material.ORANGE_WALL_BANNER ||
+			mat == Material.MAGENTA_WALL_BANNER ||
+			mat == Material.LIGHT_BLUE_WALL_BANNER ||
+			mat == Material.YELLOW_WALL_BANNER ||
+			mat == Material.LIME_WALL_BANNER ||
+			mat == Material.PINK_WALL_BANNER ||
+			mat == Material.GRAY_WALL_BANNER ||
+			mat == Material.LIGHT_GRAY_WALL_BANNER ||
+			mat == Material.CYAN_WALL_BANNER ||
+			mat == Material.PURPLE_WALL_BANNER ||
+			mat == Material.BLUE_WALL_BANNER ||
+			mat == Material.BROWN_WALL_BANNER ||
+			mat == Material.GREEN_WALL_BANNER ||
+			mat == Material.RED_WALL_BANNER ||
+			mat == Material.BLACK_WALL_BANNER;
+	}
+
+	public static final boolean isHead(Material mat) {
+		return
+			isWallHead(mat) ||
+			mat == Material.SKELETON_SKULL ||
+			mat == Material.ZOMBIE_HEAD ||
+			mat == Material.WITHER_SKELETON_SKULL ||
+			mat == Material.PLAYER_HEAD ||
+			mat == Material.CREEPER_HEAD ||
+			mat == Material.DRAGON_HEAD ||
+			mat == Material.PIGLIN_HEAD;
+	}
+	public static final boolean isWallHead(Material mat) {
+		return
+			mat == Material.SKELETON_WALL_SKULL ||
+			mat == Material.ZOMBIE_WALL_HEAD ||
+			mat == Material.WITHER_SKELETON_WALL_SKULL ||
+			mat == Material.PLAYER_WALL_HEAD ||
+			mat == Material.CREEPER_WALL_HEAD ||
+			mat == Material.DRAGON_WALL_HEAD ||
+			mat == Material.PIGLIN_WALL_HEAD;
+	}
+	public static final boolean isWallSign(Material mat) {
+		return
+			mat == Material.OAK_WALL_SIGN ||
+			mat == Material.SPRUCE_WALL_SIGN ||
+			mat == Material.JUNGLE_WALL_SIGN ||
+			mat == Material.BIRCH_WALL_SIGN ||
+			mat == Material.ACACIA_WALL_SIGN ||
+			mat == Material.CHERRY_WALL_SIGN ||
+			mat == Material.DARK_OAK_WALL_SIGN ||
+			mat == Material.PALE_OAK_WALL_SIGN ||
+			mat == Material.MANGROVE_WALL_SIGN ||
+			mat == Material.BAMBOO_WALL_SIGN ||
+			mat == Material.CRIMSON_WALL_SIGN ||
+			mat == Material.WARPED_WALL_SIGN;
+	}
+
+	public static final Material getPlankForSign(Material sign) {
+		return switch(sign) {
+			case OAK_WALL_SIGN -> Material.OAK_PLANKS;
+			case SPRUCE_WALL_SIGN -> Material.SPRUCE_PLANKS;
+			case JUNGLE_WALL_SIGN -> Material.JUNGLE_PLANKS;
+			case BIRCH_WALL_SIGN -> Material.BIRCH_PLANKS;
+			case ACACIA_WALL_SIGN -> Material.ACACIA_PLANKS;
+			case CHERRY_WALL_SIGN -> Material.CHERRY_PLANKS;
+			case DARK_OAK_WALL_SIGN -> Material.DARK_OAK_PLANKS;
+			case PALE_OAK_WALL_SIGN -> Material.PALE_OAK_PLANKS;
+			case MANGROVE_WALL_SIGN -> Material.MANGROVE_PLANKS;
+			case BAMBOO_WALL_SIGN -> Material.BAMBOO_PLANKS;
+			case CRIMSON_WALL_SIGN -> Material.CRIMSON_PLANKS;
+			case WARPED_WALL_SIGN -> Material.WARPED_PLANKS;
+			default -> sign;
+		};
+	}
+
+	public static final ItemStack[] cloneContents(ItemStack[] contents) {
+		ItemStack[] copy = new ItemStack[contents.length];
+		for(int i = 0; i < contents.length; i++) {
+			copy[i] = contents[i] == null ? null : contents[i].clone();
+		}
+		return copy;
+	}
+
+	public static final boolean canPassThru(Block block ) {
+		Material type = block.getType();
+
+		if(type.isAir() ||
+			 type == Material.WATER ||
+			 type == Material.BUBBLE_COLUMN ||
+			 block.isPassable())
+			return true;
+		return false;
+	}
+			
+	static public final boolean isLowerSlab(Block block) {
+		if( block.getBlockData() instanceof Slab slab) {
+			if( slab.getType() == Slab.Type.BOTTOM)
+				return true;
+		}
+		return false;
+	}
+
+}

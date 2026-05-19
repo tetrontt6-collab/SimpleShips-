@@ -1,0 +1,58 @@
+package simpleships;
+/*
+ * SimpleShips
+ * Copyright (c) 2026, Jere McDevitt
+ *
+ * Licensed under the MIT License.
+ * See LICENSE file in the project root for full license information.
+ */
+
+import org.bukkit.NamespacedKey;
+
+public class Constants {
+	static public final int BD_TELEPORT_DURATION  = 3;
+	static public final int BD_LERP_DURATION      = 0;
+	static public final int UPDATE_TICKS          = 1;
+	static public final float SHIP_SPEED          = 0.25f;
+	static public final float SHIP_REVERSE_SPEED  = 0.125f;
+	
+	static public final String NAME_SPACE = "simpleships";
+	
+
+	static public final NamespacedKey ITEM_TYPE_KEY = new NamespacedKey(NAME_SPACE,"item_type");
+	
+	static public final NamespacedKey SHIP_HELM_ID_KEY = new NamespacedKey(NAME_SPACE, "ship_helm_id_key");
+	static public final NamespacedKey SHIP_HELM_RECIPE_KEY = new NamespacedKey(NAME_SPACE, "ship_helm_recipe");
+	static public final String SHIP_HELM_ITEM_TYPE = "ship_helm";
+	static public final String SHIP_HELM_SEAT_TYPE = "ship_helm_seat";
+	static public final String SHIP_HELM_POST_TYPE = "ship_helm_post";
+
+	
+	static public final String ENTITY_PAD_ITEM_TYPE = "entity_pad_item";
+	static public final NamespacedKey ENTITY_PAD_ID_KEY = new NamespacedKey(NAME_SPACE, "entity_pad_item_key");
+	static public final NamespacedKey ENTITY_PAD_RECIPE_KEY = new NamespacedKey(NAME_SPACE, "entity_pad_recipe");
+	static public final String ENTITY_PAD_ID = "entity_pad_id";
+
+	static public final String PASSENGER_SEAT_ITEM_TYPE = "passenger_seat_item";
+	static public final String PASSENGER_SEAT_CUSHION_ITEM_TYPE = "passenger_seat_cushion_item";
+	static public final NamespacedKey PASSENGER_SEAT_ID_KEY = new NamespacedKey(NAME_SPACE, "passenger_seat_item_key");
+	static public final NamespacedKey PASSENGER_SEAT_RECIPE_KEY = new NamespacedKey(NAME_SPACE, "passenger_seat_recipe");
+
+
+	static public String getStringFor(final String key) {
+	 	switch(key) {
+	 		case SHIP_HELM_ITEM_TYPE:
+	 			return "Ship Helm";
+			case SHIP_HELM_SEAT_TYPE:
+				return "Ship Helm Seat";
+			case SHIP_HELM_POST_TYPE:
+				return "Ship Helm Post";
+			case ENTITY_PAD_ITEM_TYPE:
+				return "Entity Pad";
+			case PASSENGER_SEAT_ITEM_TYPE:
+				return "Passenger Seat";
+	 		default:
+	 			return key;
+	 	}
+	}
+}

@@ -1,0 +1,26 @@
+main: ${PACKAGE}.${NAME}
+name: ${NAME}
+version: "${VERSION}"
+api-version: "1.21.11"
+author: mictali
+description: A Simple Ships plugin
+commands:
+  cleanup:
+    description: Remove all ship components parts
+    usage: "/simpleships cleanup"
+  helm:
+    description: Give player a helm
+    usage: "/simpleships helm"
+  pad:
+    description: Give player an entity pad
+    usage: "/simpleships pad"
+  seat:
+    description: Give player a passenger seat
+    usage: "/simpleships seat"
+  flush:
+    description: Flush all ships and components
+    usage: "/simpleships flush"
+    
+
+
+    

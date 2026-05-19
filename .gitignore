@@ -1,0 +1,35 @@
+# Gradle
+.gradle/
+build/
+
+# Intellij
+.idea/
+*.iml
+
+# VSCode
+.vscode/
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# Emacs
+*~
+.dir-locals.el
+\#*\#
+.\#*
+classpath.txt
+build-classpath.sh
+compileClasspath.txt
+deploy.sh
+.classpath
+TAGS
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
