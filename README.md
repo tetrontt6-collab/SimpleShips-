@@ -266,10 +266,10 @@ Feedback, bug reports, and suggestions are welcome.
 	<img src="screenshots/VikingLongShip.png" width="700">
 </p>
 
-[Going a Viking](videos/GoingAViking.mp4)
+[Going a Viking](https://github.com/user-attachments/assets/6aa976c3-8467-417c-b3c7-8de4ae4a63af)
 
 <p align="center">
-	<video src="videos/GoingAViking.mp4" controls width="800"></video>
+	<video src="https://github.com/user-attachments/assets/6aa976c3-8467-417c-b3c7-8de4ae4a63af" controls width="800"></video>
 </p>	
 
 <p align="center">
