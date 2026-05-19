@@ -177,11 +177,11 @@ public class EntityPad {
 			return;
 		
 		if( !BlockSupport.isBlockAllowed(block.getType())) {
-			SimpleShipsPlugin.log(0, player, "Entity pad must be placed on an allowed block");
+			SimpleShipsPlugin.log(1, player, "Entity pad must be placed on an allowed block");
 			return;
 		}
 		if( BlockSupport.isLowerSlab(block)) {
-			SimpleShipsPlugin.log(0, player, "Entity pad can not be placed on a lower slab");
+			SimpleShipsPlugin.log(1, player, "Entity pad can not be placed on a lower slab");
 			return;
 		}
 
