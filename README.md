@@ -225,17 +225,17 @@ Note that when the pilot dismounts, the ship rematerializes back into world bloc
 
 | Command | Description |
 |---|---|
-| `/cleanup` | This will remove all ship component parts (helm/seat/pad) as an aid to cleaning up issues |
-| `/helm` | Gives the player a ship helm |
-| `/seat` | Gives the player a passenger seat |
-| `/pad` | Gives the player an entity pad |
-| `/flush` | Forces all active ships to rematerialize |
+| `/simpleshipsplugin:cleanup` | This will remove all ship component parts (helm/seat/pad) as an aid to cleaning up issues |
+| `/simpleshipsplugin:helm` | Gives the player a ship helm |
+| `/simpleshipsplugin:seat` | Gives the player a passenger seat |
+| `/simpleshipsplugin:pad` | Gives the player an entity pad |
+| `/simpleshipsplugin:flush` | Forces all active ships to rematerialize |
 
 ### Beta Note
 
 At the moment, commands are intentionally unrestricted during the beta phase.
 
-This means any player with access to commands can currently execute `/flush` and `/cleanup`, which forces all active ships to align and rematerialize and all ship components to be removed, respectively.
+This means any player with access to commands can currently execute `/simpleshipsplugin:flush` and `/simpleshipsplugin:cleanup`, which forces all active ships to align and rematerialize and all ship components to be removed, respectively.
 
 These commands exist primarily as recovery/debugging tools while the plugin continues to mature and may become permission-restricted in a future release.
 
