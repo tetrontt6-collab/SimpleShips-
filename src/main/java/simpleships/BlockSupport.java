@@ -323,6 +323,8 @@ public class BlockSupport {
 		if(type.isAir() ||
 			 type == Material.WATER ||
 			 type == Material.BUBBLE_COLUMN ||
+			 type == Material.LILY_PAD ||
+			 type == Material.KELP_PLANT ||
 			 block.isPassable())
 			return true;
 		return false;
