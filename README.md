@@ -248,6 +248,16 @@ These commands exist primarily as recovery/debugging tools while the plugin cont
 * Ships currently operate on water only
 * Decorative armor stands, player heads and item frames are supported
 
+
+---
+### Waterline Note
+
+SimpleShips is designed for surface vessels.
+
+Ships with enclosed spaces below the waterline may leave or carry water in unexpected ways when materialized and restored. If you build submarine-style vessels or sealed underwater cabins, those spaces may flood.
+
+For best results, build ships as surface vessels with no enclosed dry rooms below the waterline.
+
 ---
 
 ## Current Status
