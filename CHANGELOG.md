@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.2-beta
+Updated the collision checks to ignore kelp and lily pads
+
 ## 0.9.1-beta
 
 Initial public beta release.
