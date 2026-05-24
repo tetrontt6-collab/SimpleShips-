@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.3-beta
+Implemented immediate restore of the ship on player death to
+avoid ship loss.
+
 ## 0.9.2-beta
 Updated the collision checks to ignore kelp and lily pads
 
