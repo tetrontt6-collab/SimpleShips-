@@ -24,6 +24,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInputEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -64,6 +65,13 @@ public class HelmListener implements Listener {
 	
 	@EventHandler
 	public void onPlayerQuit(PlayerQuitEvent evt) {
+		Player player = evt.getPlayer();
+		unmountPlayer(player, true);
+	}
+
+	@EventHandler
+	public void onPlayerDeath(PlayerDeathEvent evt) {
+		SimpleShipsPlugin.log(0,"Player died, restoring ship");
 		Player player = evt.getPlayer();
 		unmountPlayer(player, true);
 	}
