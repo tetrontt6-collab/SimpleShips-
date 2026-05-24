@@ -21,6 +21,7 @@ import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -43,8 +44,10 @@ public class HelmListener implements Listener {
 	static Map<UUID, Ship>     playerToShip = new HashMap<>();
 	static Map<String, Player> mountedPlayers = new HashMap<>();
 	static Map<String, Ship>   shipById = new HashMap<>();
+	final SimpleShipsPlugin plugin;
 
-	public HelmListener() {
+	public HelmListener(SimpleShipsPlugin plugin) {
+		this.plugin = plugin;
 	}
 	
 
@@ -71,9 +74,19 @@ public class HelmListener implements Listener {
 
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent evt) {
-		SimpleShipsPlugin.log(0,"Player died, restoring ship");
+		SimpleShipsPlugin.log(0,"Player died, restoring ship ");
 		Player player = evt.getPlayer();
-		unmountPlayer(player, true);
+		if( player == null )
+			return;
+		
+		Ship ship = playerToShip.get(player.getUniqueId());
+		if( ship == null )
+			return;
+
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+				ship.forceUnmount();
+				SimpleShipsPlugin.log(0,"Unmounting player");
+			}, 5L);
 	}
 
 	static public void onPlayerPlaceEntity(PlayerInteractEvent event, ItemStack itemStack) {
@@ -84,7 +97,7 @@ public class HelmListener implements Listener {
 			return;
 
 
-		if( !BlockSupport.isBlockAllowed(block.getType())) {
+		if( !BlockSupport.isBlockAllowedForHelm(block.getType())) {
 			SimpleShipsPlugin.log(0, player, "Helm must be placed on an allowed block");
 			return;
 		}
