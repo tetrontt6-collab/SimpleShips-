@@ -12,6 +12,8 @@ import org.bukkit.Location;
 import org.bukkit.Rotation;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Container;
 import org.bukkit.util.Transformation;
 import org.bukkit.util.Vector;
 import org.joml.Matrix4f;
@@ -453,6 +455,19 @@ public class UtilFuncs {
 			case 7 -> Rotation.COUNTER_CLOCKWISE_45;
 			default -> Rotation.NONE;
 		};
+	}
+
+	static private final float EPSILON = 0.1f;
+	static public final boolean isZeroOffset(Vector3f off) {
+		return
+			(float)Math.abs(off.x) < EPSILON &&
+			(float)Math.abs(off.y) < EPSILON &&
+			(float)Math.abs(off.z) < EPSILON;
+	}
+
+	static public final boolean isContainer(Block block) {
+		BlockState state = block.getState();
+		return (state instanceof Container);
 	}
 }
 
