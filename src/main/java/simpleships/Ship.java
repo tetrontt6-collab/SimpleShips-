@@ -457,12 +457,25 @@ public class Ship {
 
 			//this is a support function that calculates the changes in x/y/z offsets that will need to be
 			//applied to account for the ship orientation change
+
 			rotated = UtilFuncs.rotateOffsetCardinal(mb.offset(), shipYawAtAssemble, finalYaw, rotated);
 			
 			Location bl = helmLoc.clone().add(rotated.x, rotated.y, rotated.z);
 			Block block = bl.getBlock();
 			BlockData data = mb.data().clone();
 			BlockState state = mb.state();
+
+			//this should be the block where the seat is sitting.
+			//since death chest plugins and datapacks generally put a container
+			//in the spot of the players death, if there is a container here
+			//we will assume that is the situation and will not restore the block.
+			if( UtilFuncs.isZeroOffset(mb.offset())) {
+				SimpleShipsPlugin.log(0,"The root block is found: (%f,%f,%f) %s", bl.getX(), bl.getY(), bl.getZ(), block.getType().toString());
+				if(UtilFuncs.isContainer(block) )
+					continue;
+			}
+
+			
 			boolean isItem = (mb.display() instanceof ItemDisplay);
 			if( isRotated ) {
 				if( data instanceof Directional dir) {
