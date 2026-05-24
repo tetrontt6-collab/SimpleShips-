@@ -46,7 +46,7 @@ public class SimpleShipsPlugin extends JavaPlugin {
 		loadConfiguration();
 
 		registerRecipes();
-		helmListener = new HelmListener();
+		helmListener = new HelmListener(this);
 		entityManager = new EntityManager(this, helmListener);
 		getServer().getPluginManager().registerEvents(helmListener, this);
 		getServer().getPluginManager().registerEvents(entityManager, this);
