@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.5-beta
+Corrected orientation issues with logs.
+
 ## 0.9.4-beta
 Added checks for using death chest type plugins or data packs.  Assuming
 the chest is placed at the location of the player's death, the re-assembly logic

@@ -8,6 +8,7 @@ package simpleships;
  */
 import java.util.HashSet;
 import java.util.Set;
+import org.bukkit.Axis;
 import org.bukkit.Location;
 import org.bukkit.Rotation;
 import org.bukkit.block.Block;
@@ -468,6 +469,22 @@ public class UtilFuncs {
 	static public final boolean isContainer(Block block) {
 		BlockState state = block.getState();
 		return (state instanceof Container);
+	}
+
+	static public final Axis rotateAxis(Axis original, float startYaw, float finalYaw) {
+		if(original == Axis.Y ) {
+			return Axis.Y;
+		}
+
+		float from = getCardinalYaw(startYaw);
+		float to   = getCardinalYaw(finalYaw);
+
+		int steps = Math.round(wrapDegrees(to - from) / 90.0f);
+		steps = ((steps % 4) + 4) % 4;
+		if((steps % 2) == 1) {
+			return original == Axis.X ? Axis.Z : Axis.X;
+		}
+		return original;
 	}
 }
 

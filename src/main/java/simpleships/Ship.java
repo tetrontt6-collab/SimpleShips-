@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.bukkit.Axis;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,6 +32,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.block.data.MultipleFacing;
+import org.bukkit.block.data.Orientable;
 import org.bukkit.block.data.Rotatable;
 import org.bukkit.block.data.Waterlogged;
 import org.bukkit.block.data.type.Bed;
@@ -477,6 +479,7 @@ public class Ship {
 
 			
 			boolean isItem = (mb.display() instanceof ItemDisplay);
+			
 			if( isRotated ) {
 				if( data instanceof Directional dir) {
 					BlockFace origDir = dir.getFacing();
@@ -487,13 +490,16 @@ public class Ship {
 					BlockFace origDir = rot.getRotation();
 					BlockFace newDir = null;
 					newDir = UtilFuncs.getRotatedItemFace(origDir, shipYawAtAssemble, finalYaw);
-							
 					rot.setRotation(newDir);
+				} else if (data instanceof Orientable ot ) {
+					Axis originalAxis = ot.getAxis();
+					Axis newAxis = UtilFuncs.rotateAxis(originalAxis, shipYawAtAssemble, finalYaw);
+					ot.setAxis(newAxis);
 				}
+					
 				if( data instanceof MultipleFacing mf) {
 					rotateMultipleFacing(mf, shipYawAtAssemble, finalYaw);
 				}
-				
 			}
 			block.setBlockData(data, true);
 			block.getState().update(true, true);
