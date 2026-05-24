@@ -106,7 +106,7 @@ public class BlockSupport {
 																									 addAll(Tag.LIGHTNING_RODS.getValues());
 																									 addAll(Tag.LOGS.getValues());
 																									 addAll(Tag.PLANKS.getValues());
-																									 addAll(Tag.STAIRS.getValues());
+																									 addAll(Tag.WOODEN_STAIRS.getValues());
 																									 addAll(Tag.TERRACOTTA.getValues());
 																									 addAll(Tag.WOODEN_SHELVES.getValues());
 																									 addAll(Tag.WOODEN_SLABS.getValues());
@@ -116,6 +116,24 @@ public class BlockSupport {
 																											 
 																								 }};
 
+
+
+	//limited set of blocks on which a helm can be placed
+	private static Set<Material> helmSupportBlocks = new HashSet<>()
+																							 {{
+																									 addAll(Tag.BAMBOO_BLOCKS.getValues());
+																									 addAll(Tag.LOGS.getValues());
+																									 addAll(Tag.PLANKS.getValues());
+																									 addAll(Tag.WOODEN_STAIRS.getValues());
+																									 addAll(Tag.TERRACOTTA.getValues());
+																									 addAll(Tag.WOODEN_SLABS.getValues());
+																									 addAll(Tag.WOODEN_TRAPDOORS.getValues());
+																									 addAll(Tag.WOOL.getValues());
+																											 
+																								 }};
+
+
+	
 	private static Set<Material> glassPanes = new HashSet<>()
 																						{{
 																								add(Material.BLACK_STAINED_GLASS_PANE);
@@ -219,6 +237,16 @@ public class BlockSupport {
 
 
 
+	public static final boolean isBlockAllowedForHelm(Material mat) {
+		if( mat == null )
+			return false;
+		if(!isBlockAllowed(mat))
+			return false;
+
+		return helmSupportBlocks.contains(mat) ||
+			glass.contains(mat) ||
+			concrete.contains(mat);
+	}
 	public static final boolean isBlockAllowed(Block block) {
 		if( block == null )
 			return false;
