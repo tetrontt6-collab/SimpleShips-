@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.4-beta
+Added checks for using death chest type plugins or data packs.  Assuming
+the chest is placed at the location of the player's death, the re-assembly logic
+now looks if there is a container at the location that the root block would be
+placed and if that is the case, the root block is not restored and the container
+is left untouched. 
+
 ## 0.9.3-beta
 Implemented immediate restore of the ship on player death to
 avoid ship loss.
