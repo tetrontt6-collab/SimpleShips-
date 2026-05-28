@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.9.6-beta
+Added enchanting tables and bookshelves to supported blocks.
+
 ## 0.9.5-beta
 Corrected orientation issues with logs.
 
