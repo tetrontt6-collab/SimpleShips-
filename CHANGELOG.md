@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.8-beta
+
+### Fixed
+
+* Modifed inventory handling to detect InventoryHolder types and not Containers, this corrects inventory loss from Shelves and BookShelves and should work for all InventoryHolders
+
+### Outstanding
+
+* Shelves currently do not show their contents when materialized but they are restored when ship is restored.
+
 ## 0.9.7-beta
 
 ### Fixed
