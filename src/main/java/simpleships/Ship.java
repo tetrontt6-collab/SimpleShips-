@@ -45,11 +45,13 @@ import org.bukkit.entity.BlockDisplay;
 import org.bukkit.entity.Display;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.GlowItemFrame;
+import org.bukkit.entity.Interaction;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.util.BoundingBox;
 import org.joml.Matrix4f;
@@ -83,6 +85,8 @@ public class Ship {
 	List<PassengerSeatHandle> passengerSeats = new ArrayList<>();
 	List<ItemFrameHandle> itemFrames = new ArrayList<>();
 	List<ArmorStandHandle> armorStands = new ArrayList<>();
+	List<InteractionHandle> interactions = new ArrayList<>();
+	List<DisplayEntityHandle> otherDisplayEntities = new ArrayList<>();
 
 	boolean movingForward;
 	boolean movingBackward;
@@ -302,6 +306,12 @@ public class Ship {
 		for(ArmorStandHandle ash : armorStands ) {
 			ash.move(loc, shipYaw);
 		}
+		for(DisplayEntityHandle deh : otherDisplayEntities) {
+			deh.move(loc, shipYaw);
+		}
+		for(InteractionHandle ih : interactions ) {
+			ih.move(loc, shipYaw);
+		}
 	}
 
 	private void assemble() {
@@ -377,13 +387,15 @@ public class Ship {
 			shipLights.clear();
 			itemFrames.clear();
 			armorStands.clear();
+			otherDisplayEntities.clear();
+			interactions.clear();
 			helmAnchor.removePassenger(pilot);
 			pilot = null;
 			return;
 		}
 
 		findAllEntitiesInBounds(blocksInShip);
-		SimpleShipsPlugin.log(0,"Found %d item frames, %d armor stands", itemFrames.size(), armorStands.size());
+		SimpleShipsPlugin.log(0,"Found %d item frames, %d armor stands, %d interactions, %d entities", itemFrames.size(), armorStands.size(), interactions.size(), otherDisplayEntities.size());
 		createItemFrameDisplays();
 		
 		for(Location remove : toRemove) {
@@ -597,6 +609,12 @@ public class Ship {
 		for(ArmorStandHandle ash : armorStands) {
 			ash.restore(helmLoc, finalYaw);
 		}
+		for(DisplayEntityHandle deh : otherDisplayEntities ) {
+			deh.restore(helmLoc, finalYaw);
+		}
+		for(InteractionHandle ih : interactions) {
+			ih.restore(helmLoc, finalYaw);
+		}
 		
 	
 		Block block = helmAnchor.getLocation().getBlock();
@@ -722,6 +740,7 @@ public class Ship {
 				bd.setInterpolationDelay(-1);
 				bd.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
 			});
+		Constants.markShipComponent(display);
 		MaterializedBlock mb = new MaterializedBlock(display, block.getBlockData(), state, offset, inventoryContents);
 		shipBlocks.add(mb);
 
@@ -778,6 +797,7 @@ public class Ship {
 					bd.setTeleportDuration(0);
 				});
 			theFrame.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+			Constants.markShipComponent(theFrame);
 			mb = new MaterializedBlock(theFrame, null, null, ifh.frameOffset, null);
 			shipBlocks.add(mb);
 
@@ -796,6 +816,7 @@ public class Ship {
 					bd.setTeleportDuration(0);
 				});
 			theBackground.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+			Constants.markShipComponent(theBackground);
 			mb = new MaterializedBlock(theBackground, null, null, ifh.frameOffset, null);
 			shipBlocks.add(mb);
 
@@ -819,6 +840,7 @@ public class Ship {
 				bd.setTeleportDuration(0);
 			});
 		theContents.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+		Constants.markShipComponent(theContents);
 		mb = new MaterializedBlock(theContents, null, null, ifh.frameOffset, null);
 		shipBlocks.add(mb);
 		
@@ -850,6 +872,7 @@ public class Ship {
 					bd.setInterpolationDelay(-1);
 					bd.setTeleportDuration(0);
 				});
+			Constants.markShipComponent(theFrame);
 			theFrame.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
 			mb = new MaterializedBlock(theFrame, null, null, ifh.frameOffset, null);
 			shipBlocks.add(mb);
@@ -870,6 +893,7 @@ public class Ship {
 			 		bd.setInterpolationDelay(-1);
 			 		bd.setTeleportDuration(0);
 			 	});
+			Constants.markShipComponent(theBackground);
 			theBackground.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
 			mb = new MaterializedBlock(theBackground, null, null, ifh.frameOffset, null);
 			shipBlocks.add(mb);
@@ -896,6 +920,7 @@ public class Ship {
 				bd.setTeleportDuration(0);
 			});
 		theContents.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+		Constants.markShipComponent(theContents);
 		mb = new MaterializedBlock(theContents, null, null, ifh.frameOffset, null);
 		shipBlocks.add(mb);
 
@@ -949,6 +974,7 @@ public class Ship {
 				bd.setTeleportDuration(0);
 			});
 		display.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+		Constants.markShipComponent(display);
 		MaterializedBlock mb = new MaterializedBlock(display, block.getBlockData(), state==null?null:state.copy(), offset, null);
 		shipBlocks.add(mb);
 	}
@@ -991,6 +1017,7 @@ public class Ship {
 		display.setTransformationMatrix(rotation);
 
 		display.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+		Constants.markShipComponent(display);
 		MaterializedBlock mb = new MaterializedBlock(display, block.getBlockData(), state==null?null:state.copy(), offset, null);
 		shipBlocks.add(mb);
 	}
@@ -1030,6 +1057,7 @@ public class Ship {
 				bd.setTeleportDuration(0);
 			});
 		display.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+		Constants.markShipComponent(display);
 		MaterializedBlock mb = new MaterializedBlock(display, block.getBlockData(), state==null?null:state.copy(), offset, null);
 		shipBlocks.add(mb);
 	}
@@ -1079,6 +1107,7 @@ public class Ship {
 				bd.setTeleportDuration(0);
 			});
 		display.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+		Constants.markShipComponent(display);
 		MaterializedBlock mb = new MaterializedBlock(display, block.getBlockData(), state==null?null:state.copy(), offset, null);
 		shipBlocks.add(mb);
 	}
@@ -1106,6 +1135,7 @@ public class Ship {
 				bd.setInterpolationDelay(-1);
 				bd.setTeleportDuration(0);
 			});
+		Constants.markShipComponent(display);
 		display.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
 		MaterializedBlock mb = new MaterializedBlock(display, block.getBlockData(), state==null?null:state.copy(), offset, inventoryContents);
 		shipBlocks.add(mb);
@@ -1134,6 +1164,8 @@ public class Ship {
 				as.setGravity(false);
 				as.setPersistent(true);
 			});
+		SimpleShipsPlugin.log(0,"Marking helm anchor");
+		Constants.markShipComponent(helmAnchor);
 
 	}
 
@@ -1269,32 +1301,46 @@ public class Ship {
 			Location eloc = entity.getLocation().clone();
 			if(!largerBox.contains(eloc.getX(), eloc.getY(), eloc.getZ()))
 				continue;
+
+			
+			if( entity.getVehicle() != null ) {
+				//this entity is riding in/on another entity, any direct teleports of the
+				//entity will break that hierarchy, so we won't manage these independently.
+				continue;
+			}
 			
 			Vector3f worldOffset = new Vector3f((float)(eloc.getX() - anchor.getX()),
 																		 (float)(eloc.getY() - anchor.getY()),
 																		 (float)(eloc.getZ() - anchor.getZ()));
-			if( (entity instanceof BlockDisplay) ||
-					(entity instanceof ItemDisplay)) {
-				//the materialized blocks already exist so they all get found.  for the
-				//ship parts we monitor for ArmorStands to identify them as they all
-				//have an armor stand
-				continue;
-			}
+
 			if( entity instanceof ArmorStand stand) {
 				SimpleShipsPlugin.log(0,"Entity is an armor stand");
-				if(isHelmStand(stand) )
+				if(isHelmStand(stand) ) {
+					SimpleShipsPlugin.log(0,"Helm Stand");
 					continue;
+				}
 				if(EntityPad.isEntityPadPost(stand)) {
+					SimpleShipsPlugin.log(0,"Entity pad");
 					captureEntityPad(eloc,stand);
 					continue;
 				}
 				if(PassengerSeat.isPassengerSeat(stand)) {
+					SimpleShipsPlugin.log(0,"Passenger Seat");
 					capturePassengerSeat(eloc, stand);
 					continue;
 				}
+				SimpleShipsPlugin.log(0,"ArmorStand is not a ship compoment, capturing");
 				armorStands.add(new ArmorStandHandle(stand, anchor, shipYawAtAssemble));
-			} else 	if(entity instanceof ItemFrame frame) {
+			}
+			if(Constants.isShipComponent(entity)) {
+				continue;
+			}
 
+			if( entity instanceof Display display) {
+				//previous check for ship component should have skipped any ship blocks.
+				otherDisplayEntities.add(new DisplayEntityHandle(display, anchor, shipYawAtAssemble));
+				continue;
+			} else 	if(entity instanceof ItemFrame frame) {
 				BlockFace attachedFace = frame.getAttachedFace();
 				Block attachedBlock = frame.getLocation().getBlock().getRelative(attachedFace);
 				Location attachedLoc = attachedBlock.getLocation();
@@ -1305,6 +1351,14 @@ public class Ship {
 					itemFrames.add(new ItemFrameHandle(anchor, eloc, worldOffset, frame));
 					frame.remove();
 				}
+			} else if( entity instanceof Interaction interaction ) {
+				//used by some decoration data packs
+				if(EntityPad.isEntityPadInteraction(interaction)) {
+					continue;
+				}
+				interactions.add(new InteractionHandle(interaction, anchor, shipYawAtAssemble));
+			} else {
+				SimpleShipsPlugin.log(0,"Entity is un-supported: %s %s", entity.getType().name(), entity.getName());
 			}
 		}
 	}

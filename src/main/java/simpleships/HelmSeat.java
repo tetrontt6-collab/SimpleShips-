@@ -55,6 +55,7 @@ public class HelmSeat {
 		seat.teleport(blockLocation);
 		seat.getPersistentDataContainer().set(Constants.ITEM_TYPE_KEY, PersistentDataType.STRING, Constants.SHIP_HELM_SEAT_TYPE);
 		seat.getPersistentDataContainer().set(Constants.SHIP_HELM_ID_KEY, PersistentDataType.STRING, helmId);
+		Constants.markShipComponent(seat);
 
 		
 		BlockData postBlockData = Bukkit.createBlockData(Material.SPRUCE_FENCE);
@@ -70,6 +71,7 @@ public class HelmSeat {
 				entity.setTeleportDuration(0);
 			});
 		post.teleport(blockLocation);
+		Constants.markShipComponent(post);
 
 		post.getPersistentDataContainer().set(Constants.ITEM_TYPE_KEY, PersistentDataType.STRING, Constants.SHIP_HELM_POST_TYPE);
 		post.getPersistentDataContainer().set(Constants.SHIP_HELM_ID_KEY, PersistentDataType.STRING, helmId);

@@ -83,6 +83,7 @@ public class EntityPad {
 				as.setPersistent(true);
 			});
 		post.getPersistentDataContainer().set(Constants.ITEM_TYPE_KEY, PersistentDataType.STRING, Constants.ENTITY_PAD_ITEM_TYPE);
+		Constants.markShipComponent(post);
 
 		BlockData nestBlockData = Bukkit.createBlockData(Material.HORN_CORAL_FAN);
 		nest = world.spawn(padLoc.clone(), BlockDisplay.class, id -> {
@@ -96,6 +97,7 @@ public class EntityPad {
 			});
 		nest.getPersistentDataContainer().set(Constants.ITEM_TYPE_KEY, PersistentDataType.STRING, Constants.ENTITY_PAD_ITEM_TYPE);
 		nest.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+		Constants.markShipComponent(nest);
 
 		clickTarget = world.spawn(padLoc.clone().add(0.0f, 0.0f, 0.0f), Interaction.class, ic -> {
 				ic.setInteractionWidth(1.0f);
@@ -104,6 +106,7 @@ public class EntityPad {
 				ic.setPersistent(true);
 			});
 		clickTarget.getPersistentDataContainer().set(Constants.ITEM_TYPE_KEY, PersistentDataType.STRING, Constants.ENTITY_PAD_ITEM_TYPE);
+		Constants.markShipComponent(clickTarget);
 	}
 
 	private void setPadId(UUID uuid) {

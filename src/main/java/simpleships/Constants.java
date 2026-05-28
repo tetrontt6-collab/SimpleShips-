@@ -8,6 +8,9 @@ package simpleships;
  */
 
 import org.bukkit.NamespacedKey;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataHolder;
+import org.bukkit.persistence.PersistentDataType;
 
 public class Constants {
 	static public final int BD_TELEPORT_DURATION  = 3;
@@ -20,6 +23,8 @@ public class Constants {
 	
 
 	static public final NamespacedKey ITEM_TYPE_KEY = new NamespacedKey(NAME_SPACE,"item_type");
+	static public final NamespacedKey SHIP_COMPONENT_KEY = new NamespacedKey(NAME_SPACE,"simple_ships_component_key");
+	static public final String SHIP_COMPONENT_ITEM_TYPE = "simple_ships_component";
 	
 	static public final NamespacedKey SHIP_HELM_ID_KEY = new NamespacedKey(NAME_SPACE, "ship_helm_id_key");
 	static public final NamespacedKey SHIP_HELM_RECIPE_KEY = new NamespacedKey(NAME_SPACE, "ship_helm_recipe");
@@ -39,6 +44,22 @@ public class Constants {
 	static public final NamespacedKey PASSENGER_SEAT_RECIPE_KEY = new NamespacedKey(NAME_SPACE, "passenger_seat_recipe");
 
 
+	static final public boolean isShipComponent(Object obj) {
+		if( obj instanceof PersistentDataHolder pdh) {
+			PersistentDataContainer pdc = pdh.getPersistentDataContainer();
+			if( SHIP_COMPONENT_ITEM_TYPE.equals(pdc.get(Constants.SHIP_COMPONENT_KEY, PersistentDataType.STRING)))
+				return true;
+		}
+		return false;
+	}
+
+	static final public void markShipComponent(Object obj) {
+		if( obj instanceof PersistentDataHolder pdh) {	
+			PersistentDataContainer pdc = pdh.getPersistentDataContainer();
+			pdc.set(Constants.SHIP_COMPONENT_KEY, PersistentDataType.STRING, Constants.SHIP_COMPONENT_ITEM_TYPE);
+		}
+	}
+	
 	static public String getStringFor(final String key) {
 	 	switch(key) {
 	 		case SHIP_HELM_ITEM_TYPE:
@@ -51,6 +72,8 @@ public class Constants {
 				return "Entity Pad";
 			case PASSENGER_SEAT_ITEM_TYPE:
 				return "Passenger Seat";
+			case SHIP_COMPONENT_ITEM_TYPE:
+				return "Ship Component";
 	 		default:
 	 			return key;
 	 	}

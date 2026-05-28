@@ -371,6 +371,7 @@ public class PassengerSeat  {
 		stair.teleport(seatLoc);
 		stair.getPersistentDataContainer().set(Constants.ITEM_TYPE_KEY, PersistentDataType.STRING, Constants.PASSENGER_SEAT_ITEM_TYPE);
 		stair.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+		Constants.markShipComponent(stair);
 
 		Matrix4f cushionTransform = new Matrix4f()
 			.identity()
@@ -390,6 +391,7 @@ public class PassengerSeat  {
 		cushion.teleport(seatLoc);
 		cushion.getPersistentDataContainer().set(Constants.ITEM_TYPE_KEY, PersistentDataType.STRING, Constants.PASSENGER_SEAT_CUSHION_ITEM_TYPE);
 		cushion.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+		Constants.markShipComponent(cushion);
 				
 
 	}
