@@ -26,6 +26,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
+import org.bukkit.block.Shelf;
 import org.bukkit.block.Sign;
 import org.bukkit.block.Skull;
 import org.bukkit.block.data.BlockData;
@@ -50,6 +51,7 @@ import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -548,28 +550,12 @@ public class Ship {
 		//need to be setup correctly before we do this
 		for(BlockAndState restoredBlock : restoredBlocks) {
 			BlockState state = restoredBlock.block().getState();
-			if( state instanceof Container container ) {
+			if( state instanceof InventoryHolder container ) {
 				Block block = restoredBlock.block();
-				boolean isChest = false;
-				boolean isDoubleChest = false;
-				boolean isLeftChest = false;
-				if( block.getBlockData() instanceof Chest chest) {
-				 	isChest = true;
-				 	isDoubleChest = chest.getType() != Chest.Type.SINGLE;
-				 	isLeftChest  = chest.getType() == Chest.Type.LEFT;
-				}
 				
 				ItemStack[] ic = restoredBlock.inventoryContents();
-				try {
-					if( ic != null ) {
-						if(isDoubleChest )
-							container.getInventory().setContents(BlockSupport.cloneContents(ic));
-						else
-							container.getSnapshotInventory().setContents(BlockSupport.cloneContents(ic));
-					}
-				} catch(Exception ex) {
-				}
-				container.update(true,false);
+				if( ic != null )
+					container.getInventory().setContents(ic);
 			}
 		}
 
@@ -661,10 +647,6 @@ public class Ship {
 																	 blockLoc.getBlockZ() - startLoc.getBlockZ());
 		
 
-		if( Material.ITEM_FRAME.equals(type)) {
-			SimpleShipsPlugin.log(0,"Item frame is the block");
-		}
-		
 		if(!BlockSupport.isBlockAllowed(type)) {
 			if( type == Material.WATER ) {
 				touchingWater = true;
@@ -678,10 +660,11 @@ public class Ship {
 		ItemStack[] inventoryContents = null;
 		BlockData displayData = block.getBlockData().clone();
 
-		if( block.getState() instanceof Container container) {
-			inventoryContents = BlockSupport.cloneContents(container.getInventory().getContents());
-			SimpleShipsPlugin.log(0,"Found a container");
+		if( block.getState() instanceof InventoryHolder inventory) {
+			inventoryContents = BlockSupport.cloneContents(inventory.getInventory().getContents());
+			SimpleShipsPlugin.log(0,"Found and inventory holder : %s", type);
 		}
+
 		
 		if( displayData instanceof Chest chest ) {
 			SimpleShipsPlugin.log(0,"Found a chest");
@@ -725,9 +708,12 @@ public class Ship {
 			return true;
 		}
 
-		if( Material.ITEM_FRAME.equals(type)) {
-			SimpleShipsPlugin.log(0,"Item frame is handled default");
-		}
+
+		// if( block.getState() instanceof Shelf ) {
+		// 	SimpleShipsPlugin.log(0,"Found a shelf");
+		// 	addShelfDisplay(world, block, displayData, startLoc, offset, inventoryContents);
+		// 	return true;
+		// }
 
 		BlockDisplay display = null;
 		Matrix4f trans = new Matrix4f().identity().rotate(orient).translate(offset.x-0.5f, offset.y - SHIP_VERTICAL_OFFSET, offset.z - 0.5f);
@@ -1062,6 +1048,33 @@ public class Ship {
 		shipBlocks.add(mb);
 	}
 
+	private void addShelfDisplay(World world, Block block, BlockData displayData, Location startLoc, Vector3f offset, ItemStack[] ic) {
+		BlockFace facing = null;  //only wall banners are Directional
+		Display display = null;
+		Matrix4f rotation = new Matrix4f().identity();
+		Material mat = block.getType();
+		BlockState state = block.getState();
+		Collection<ItemStack> items = block.getDrops();
+		ItemStack itemStack = items != null && items.size() > 0 ? items.iterator().next().clone() : ItemStack.of(mat);
+		
+		Matrix4f trans = new Matrix4f(rotation);
+		float facingYaw = UtilFuncs.getYawDegrees(facing);
+		
+		display = world.spawn(helmAnchor.getLocation().clone(), ItemDisplay.class, bd -> {
+				bd.setItemStack(itemStack);
+				bd.setPersistent(false);
+				bd.setGravity(false);
+				bd.setTransformationMatrix(trans);
+				bd.setInterpolationDuration(Constants.BD_LERP_DURATION);
+				bd.setInterpolationDelay(-1);
+				bd.setTeleportDuration(0);
+			});
+		display.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+		Constants.markShipComponent(display);
+		MaterializedBlock mb = new MaterializedBlock(display, block.getBlockData(), state==null?null:state.copy(), offset, ic);
+		shipBlocks.add(mb);
+	}
+	
 	/**
 	 * Banners have 2 states - wall and standing.  As with other similar blocks,
 	 * the wall version uses the Directional interface to identify the block they
