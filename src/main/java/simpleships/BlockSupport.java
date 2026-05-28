@@ -20,10 +20,12 @@ public class BlockSupport {
 																							 {{
 																									 add(Material.ARMOR_STAND);
 																									 add(Material.BARREL);
+																									 add(Material.BOOKSHELF);
 																									 add(Material.CAMPFIRE);
 																									 add(Material.CARTOGRAPHY_TABLE);
 																									 add(Material.CAULDRON);
 																									 add(Material.CHEST);
+																									 add(Material.CHISELED_BOOKSHELF);
 																									 add(Material.COMPOSTER);
 																									 add(Material.COPPER_CHEST);
 																									 add(Material.CRAFTER);
@@ -37,6 +39,7 @@ public class BlockSupport {
 																									 add(Material.DRAGON_WALL_HEAD);
 																									 add(Material.DROPPER);
 																									 add(Material.EMERALD);
+																									 add(Material.ENCHANTING_TABLE);
 																									 add(Material.ENDER_CHEST);
 																									 add(Material.END_ROD);
 																									 add(Material.FLETCHING_TABLE);
