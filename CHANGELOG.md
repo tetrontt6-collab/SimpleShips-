@@ -1,10 +1,30 @@
 # Changelog
 
+## 0.9.7-beta
+
+### Fixed
+
+* Improved entity scanning logic to better preserve internal SimpleShips control entities while excluding managed ship display components.
+
+### Improved
+
+* Added support for transporting third-party decorative display entities attached to ships.
+* Improved compatibility with decoration-style datapacks and plugins that use `Display` and `Interaction` entities.
+* Decorative entities that are part of parent/child passenger hierarchies are now preserved correctly during ship movement and restoration.
+* Decorations from datapacks such as *Decorations Plus* now move and restore correctly with ships.
+* External display entities now temporarily inherit SimpleShips interpolation and teleport settings during movement for smoother visual motion, with original settings restored on disassembly.
+
+### Compatibility
+
+* Improved interoperability with datapacks/plugins that use composite entity structures for custom decorations.
+* Prevented orphaned display entities caused by independent movement of passenger-linked decorative entities.
+
+
 ## 0.9.6-beta
 Added enchanting tables and bookshelves to supported blocks.
 
 ## 0.9.5-beta
-Corrected orientation issues with logs.
+Corrected orientation issues with logs and blocks that are Orientable.
 
 ## 0.9.4-beta
 Added checks for using death chest type plugins or data packs.  Assuming
