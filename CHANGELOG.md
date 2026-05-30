@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.9-beta
+
+### Fixed
+
+* Shelves now properly show their contents when virtualized
+
 ## 0.9.8-beta
 
 ### Fixed

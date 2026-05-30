@@ -709,11 +709,11 @@ public class Ship {
 		}
 
 
-		// if( block.getState() instanceof Shelf ) {
-		// 	SimpleShipsPlugin.log(0,"Found a shelf");
-		// 	addShelfDisplay(world, block, displayData, startLoc, offset, inventoryContents);
-		// 	return true;
-		// }
+		if( block.getState() instanceof Shelf ) {
+		 	SimpleShipsPlugin.log(0,"Found a shelf");
+			addShelfDisplay(world, block, displayData, startLoc, offset, inventoryContents, orient);
+			return true;
+		}
 
 		BlockDisplay display = null;
 		Matrix4f trans = new Matrix4f().identity().rotate(orient).translate(offset.x-0.5f, offset.y - SHIP_VERTICAL_OFFSET, offset.z - 0.5f);
@@ -1048,31 +1048,78 @@ public class Ship {
 		shipBlocks.add(mb);
 	}
 
-	private void addShelfDisplay(World world, Block block, BlockData displayData, Location startLoc, Vector3f offset, ItemStack[] ic) {
-		BlockFace facing = null;  //only wall banners are Directional
-		Display display = null;
-		Matrix4f rotation = new Matrix4f().identity();
-		Material mat = block.getType();
+	private void addShelfDisplay(World world, Block block, BlockData displayData, Location startLoc, Vector3f offset, ItemStack[] inventoryContents, Quaternionf shipRot) {
+		BlockDisplay display = null;
+		BlockFace face = null;
 		BlockState state = block.getState();
-		Collection<ItemStack> items = block.getDrops();
-		ItemStack itemStack = items != null && items.size() > 0 ? items.iterator().next().clone() : ItemStack.of(mat);
+		Vector3f itemOffset = new Vector3f(0,0,0);
+
+		if( displayData instanceof Directional directional) {
+			face = directional.getFacing();
+			itemOffset = UtilFuncs.getWallOffset(0.0f, face);
+		}
+
+		float itemYaw = UtilFuncs.getYawDegrees(face);
 		
-		Matrix4f trans = new Matrix4f(rotation);
-		float facingYaw = UtilFuncs.getYawDegrees(facing);
-		
-		display = world.spawn(helmAnchor.getLocation().clone(), ItemDisplay.class, bd -> {
-				bd.setItemStack(itemStack);
+		Matrix4f trans = new Matrix4f().identity().rotate(shipRot).translate(offset.x-0.5f, offset.y - SHIP_VERTICAL_OFFSET, offset.z - 0.5f);
+		display = world.spawn(helmAnchor.getLocation().clone(), BlockDisplay.class, bd -> {
+				bd.setBlock(displayData);
 				bd.setPersistent(false);
+				bd.setTransformationMatrix(new Matrix4f(trans));
 				bd.setGravity(false);
-				bd.setTransformationMatrix(trans);
 				bd.setInterpolationDuration(Constants.BD_LERP_DURATION);
 				bd.setInterpolationDelay(-1);
-				bd.setTeleportDuration(0);
+				bd.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
 			});
-		display.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
 		Constants.markShipComponent(display);
-		MaterializedBlock mb = new MaterializedBlock(display, block.getBlockData(), state==null?null:state.copy(), offset, ic);
+		MaterializedBlock mb = new MaterializedBlock(display, block.getBlockData(), state ==null?null:state.copy(), offset, inventoryContents);
 		shipBlocks.add(mb);
+
+		
+		if( inventoryContents != null ) {
+			int slot = -1;
+			for(ItemStack item : inventoryContents ) {
+				//I think these go in order, left to right.
+				if( item != null ) {
+					Vector3f translation = new Vector3f(offset.x - (itemOffset.x *  (14 * ONE_64)) + (itemOffset.z * (slot * (20 * ONE_64))),
+																				offset.y - SHIP_VERTICAL_OFFSET + 0.5f,
+																				offset.z - (itemOffset.z * (14 * ONE_64)) - (itemOffset.x * (slot * (20 * ONE_64))));
+					SimpleShipsPlugin.log(0,"Adding item %s to slot %d translation (%f,%f,%f)  off(%f,%f,%f)",
+																item.getType(),
+																slot,
+																translation.x, translation.y, translation.z,
+																itemOffset.x, itemOffset.y, itemOffset.z);
+
+					float itemRotation = 0;
+					if( item.getType().isBlock())
+						itemRotation = -itemYaw;
+					else
+						itemRotation = itemYaw;
+					
+					Matrix4f xt = new Matrix4f()
+					 	.identity()
+					 	.rotate(shipRot)
+					 	.translate(translation)
+						.rotateY((float)Math.toRadians(itemRotation))
+					 	.scale(16 * ONE_64);
+				 
+
+					ItemStack matItem = item.clone();
+					ItemDisplay itemDisplay = world.spawn(helmAnchor.getLocation().clone(), ItemDisplay.class);
+					itemDisplay.setItemStack(matItem);
+					itemDisplay.setPersistent(false);
+					itemDisplay.setGravity(false);
+					itemDisplay.setTransformationMatrix(new Matrix4f(xt));
+					itemDisplay.setInterpolationDuration(Constants.BD_LERP_DURATION);
+					itemDisplay.setInterpolationDelay(-1);
+					itemDisplay.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
+					Constants.markShipComponent(itemDisplay);
+					mb = new MaterializedBlock(itemDisplay, null, null, offset, null);
+					shipBlocks.add(mb);
+				}
+				slot++;
+			}
+		}
 	}
 	
 	/**
