@@ -89,6 +89,7 @@ public class Ship {
 	List<ArmorStandHandle> armorStands = new ArrayList<>();
 	List<InteractionHandle> interactions = new ArrayList<>();
 	List<DisplayEntityHandle> otherDisplayEntities = new ArrayList<>();
+	List<RespawnHandle> respawns = new ArrayList<>();
 
 	boolean movingForward;
 	boolean movingBackward;
@@ -389,6 +390,7 @@ public class Ship {
 			shipLights.clear();
 			itemFrames.clear();
 			armorStands.clear();
+			respawns.clear();
 			otherDisplayEntities.clear();
 			interactions.clear();
 			helmAnchor.removePassenger(pilot);
@@ -397,6 +399,18 @@ public class Ship {
 		}
 
 		findAllEntitiesInBounds(blocksInShip);
+
+		//for the pilot and each passenger seat, if there is a player attached,
+		//check if that player's respawnLocation is on the ship and capture it
+		//if it is.
+		checkPlayerRespawn(startLoc, pilot, blocksInShip);
+		for(PassengerSeatHandle psh : passengerSeats) {
+			Player rider = psh.seat.getPassenger();
+			if( rider != null )
+				checkPlayerRespawn(startLoc, rider, blocksInShip);
+		}
+													 
+		
 		SimpleShipsPlugin.log(0,"Found %d item frames, %d armor stands, %d interactions, %d entities", itemFrames.size(), armorStands.size(), interactions.size(), otherDisplayEntities.size());
 		createItemFrameDisplays();
 		
@@ -479,6 +493,7 @@ public class Ship {
 			Location bl = helmLoc.clone().add(rotated.x, rotated.y, rotated.z);
 			Block block = bl.getBlock();
 			BlockData data = mb.data().clone();
+
 			BlockState state = mb.state();
 
 			//this should be the block where the seat is sitting.
@@ -616,6 +631,14 @@ public class Ship {
 		stopMoving();
 		moveAllComponents(helmLoc);
 
+		//check if the pilot or passengers had a bed spawn point
+		//at assembly and move that.
+		if( respawns.size() != 0 ) {
+			for(RespawnHandle rh : respawns ) {
+				rh.updateSpawnPoint(helmLoc, shipYawAtAssemble, finalYaw);
+			}
+		}
+
 		//remove the captured blocks.  this means that next
 		//mount could pick up more blocks, but that is a
 		//chosen tradeoff to avoid complexity
@@ -624,6 +647,10 @@ public class Ship {
 		entityPads.clear();
 		passengerSeats.clear();
 		itemFrames.clear();
+		respawns.clear();
+		armorStands.clear();
+		otherDisplayEntities.clear();
+		interactions.clear();
 	}
 
 	private void moveAllComponents(Location loc) {
@@ -1198,6 +1225,7 @@ public class Ship {
 		Constants.markShipComponent(display);
 		display.setTeleportDuration(Constants.BD_TELEPORT_DURATION);
 		MaterializedBlock mb = new MaterializedBlock(display, block.getBlockData(), state==null?null:state.copy(), offset, inventoryContents);
+
 		shipBlocks.add(mb);
 	}
 
@@ -1429,44 +1457,47 @@ public class Ship {
 		}
 	}
 
+	private void checkPlayerRespawn(Location anchor, Player player, HashSet<Vector3i> blocksInShip) {
+		SimpleShipsPlugin.log(0,"Checking for respawn for %s", player.getUniqueId().toString());
+		Location loc = player.getRespawnLocation();
+		if( loc == null ) {
+			SimpleShipsPlugin.log(0,"No respawn point set for player");
+			return;
+		}
+
+		Vector3i blockLoc = new Vector3i();
+		boolean isOnShip = false;
+		for(int y = -1; !isOnShip && y <= 1; y++) {
+			for(int z = -1; !isOnShip && z <= 1; z++) {
+				for(int x = -1; !isOnShip && x <= 1; x++) {
+					blockLoc.set(x + loc.getBlockX(),y + loc.getBlockY(), z + loc.getBlockZ());
+					if( blocksInShip.contains(blockLoc)) {
+						Block blockAt = loc.getWorld().getBlockAt(blockLoc.x, blockLoc.y, blockLoc.z);
+						if( blockAt != null && (blockAt.getBlockData() instanceof Bed)) {
+							isOnShip = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+			
+
+		if(isOnShip ) {
+			blockLoc.set(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+			SimpleShipsPlugin.log(0,"Respawn (%d,%d,%d) for %s found in ship", blockLoc.x, blockLoc.y, blockLoc.z, player.getUniqueId().toString());
+			Vector3f offset = new Vector3f(loc.getBlockX() - anchor.getBlockX(),
+																		 loc.getBlockY() - anchor.getBlockY(),
+																		 loc.getBlockZ() - anchor.getBlockZ());
+			respawns.add(new RespawnHandle(player, offset));
+		} else {
+			SimpleShipsPlugin.log(0,"Respawn point not on ship");
+		}
+	}
+
+	
 	
 	record BlockAndState(Block block, BlockState state, ItemStack[] inventoryContents) { }
-
-
-
-	
-
-
-	
-	
-	class EntityPadHandle {
-		final EntityPad pad;
-		final Vector3f offset;
-
-		EntityPadHandle(EntityPad pad, Vector3f offset) {
-			this.pad = pad;
-			this.offset = new Vector3f(offset);
-		}
-
-		void move(Location loc) {
-			pad.move(loc);
-		}
-	}
-
-	class PassengerSeatHandle {
-		final PassengerSeat seat;
-		final Vector3f offset;
-
-		PassengerSeatHandle(PassengerSeat seat, Vector3f offset) {
-			this.seat = seat;
-			this.offset = new Vector3f(offset);
-		}
-
-		void move(Location loc) {
-			seat.move(loc);
-		}
-	}
-	
 }
 
 

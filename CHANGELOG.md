@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.10-beta
+
+### Enhancement
+
+* Add support for moving a player's spawn point bed when it is on a moving vehicle
+
 ## 0.9.9-beta
 
 ### Fixed

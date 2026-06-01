@@ -203,6 +203,13 @@ public class PassengerSeat  {
 		
 	}
 
+	public Player getPassenger() {
+		if( attachedEntityId == null )
+			return null;
+		Player player = Bukkit.getPlayer(attachedEntityId);
+		return player;
+	}
+
 	private void detachEntity() {
 		if( attachedEntityId == null) {
 			return;
