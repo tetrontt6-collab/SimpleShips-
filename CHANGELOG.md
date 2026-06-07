@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.9.11-beta
+
+* Modified helm recipe to work with any wooden trapdoor and wooden fence post
+* Modified seat recipe to work with any wooden stair and carpet
+* Modified pad recipe to work with any wooden fence post
+
 ## 0.9.10-beta
 
 ### Enhancement

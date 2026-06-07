@@ -13,6 +13,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.World;
 import org.bukkit.block.Sign;
 import org.bukkit.command.Command;
@@ -20,6 +21,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
@@ -139,8 +141,8 @@ public class SimpleShipsPlugin extends JavaPlugin {
 											 ".F.",
 											 ".I."
 											 );
-			helmRecipe.setIngredient('S', Material.SPRUCE_TRAPDOOR);
-			helmRecipe.setIngredient('F', Material.SPRUCE_FENCE);
+			helmRecipe.setIngredient('S', new RecipeChoice.MaterialChoice(Tag.WOODEN_TRAPDOORS));
+			helmRecipe.setIngredient('F', new RecipeChoice.MaterialChoice(Tag.WOODEN_FENCES));
 			helmRecipe.setIngredient('I', Material.IRON_INGOT);
 			Bukkit.addRecipe(helmRecipe);
 		}
@@ -154,7 +156,7 @@ public class SimpleShipsPlugin extends JavaPlugin {
 														".F.",
 														".I.");
 			entityPadRecipe.setIngredient('H', Material.HAY_BLOCK);
-			entityPadRecipe.setIngredient('F', Material.OAK_FENCE);
+			entityPadRecipe.setIngredient('F', new RecipeChoice.MaterialChoice(Tag.WOODEN_FENCES));
 			entityPadRecipe.setIngredient('I', Material.IRON_INGOT);
 			Bukkit.addRecipe(entityPadRecipe);
 		}
@@ -167,8 +169,8 @@ public class SimpleShipsPlugin extends JavaPlugin {
 			passengerSeatRecipe.shape(".Y.",
 														".S.",
 														".I.");
-			passengerSeatRecipe.setIngredient('Y', Material.YELLOW_CARPET);
-			passengerSeatRecipe.setIngredient('S', Material.MANGROVE_STAIRS);
+			passengerSeatRecipe.setIngredient('Y', new RecipeChoice.MaterialChoice(Tag.WOOL_CARPETS));
+			passengerSeatRecipe.setIngredient('S', new RecipeChoice.MaterialChoice(Tag.WOODEN_STAIRS));
 			passengerSeatRecipe.setIngredient('I', Material.IRON_INGOT);
 			Bukkit.addRecipe(passengerSeatRecipe);
 		}
