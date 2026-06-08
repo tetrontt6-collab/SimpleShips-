@@ -54,6 +54,14 @@ SimpleShips preserves many decorative elements while ships are materialized:
 
 Inventories and most block state information are restored automatically when ships disassemble.
 
+### Death Chest Compatibility
+
+When a ship rematerializes after the pilot dies, SimpleShips will not overwrite a container found at the helm/root block location.
+
+This is intended to improve compatibility with death chest and grave-style plugins or datapacks, which often place a recovery container at the player's death location.
+
+In this situation, the recovery container is preserved and the ship may be restored with one missing block near the helm.
+
 ---
 
 ## Living Aboard Your Ship
