@@ -69,7 +69,6 @@ import org.joml.Vector3i;
  */
 public class Ship {
 	final UUID uniqueId;
-	static final float ONE_64 = 1.0f/64.0f;
 	static final float SHIP_VERTICAL_OFFSET = 0.45f;
 	static final float HELM_VERTICAL_OFFSET = 0.45f;
 	
@@ -84,6 +83,7 @@ public class Ship {
 	List<MaterializedBlock> shipBlocks = new ArrayList<>();
 	List<MovingBlock> shipLights = new ArrayList<>();
 	List<EntityPadHandle> entityPads = new ArrayList<>();
+	List<ParrotPerchHandle> parrotPerchs = new ArrayList<>();
 	List<PassengerSeatHandle> passengerSeats = new ArrayList<>();
 	List<ItemFrameHandle> itemFrames = new ArrayList<>();
 	List<ArmorStandHandle> armorStands = new ArrayList<>();
@@ -616,6 +616,9 @@ public class Ship {
 		for(InteractionHandle ih : interactions) {
 			ih.restore(helmLoc, finalYaw);
 		}
+		for(ParrotPerchHandle pph : parrotPerchs) {
+			pph.restore(helmLoc, finalYaw);
+		}
 		
 	
 		Block block = helmAnchor.getLocation().getBlock();
@@ -645,6 +648,7 @@ public class Ship {
 		shipBlocks.clear();
 		shipLights.clear();
 		entityPads.clear();
+		parrotPerchs.clear();
 		passengerSeats.clear();
 		itemFrames.clear();
 		respawns.clear();
@@ -661,6 +665,9 @@ public class Ship {
 		for(PassengerSeatHandle psh : passengerSeats) {
 			Location componentLocation = psh.seat.getSeatLocation(loc, psh.offset, this.shipYaw);
 			psh.move(componentLocation);
+		}
+		for(ParrotPerchHandle pph : parrotPerchs) {
+			pph.move(loc, this.shipYaw);
 		}
 	}
 	
@@ -788,7 +795,7 @@ public class Ship {
 	}
 
 	private void createUpDownItemFrame(ItemFrameHandle ifh) {
-		Vector3f scale = new Vector3f(48 * ONE_64, 48 * ONE_64, 5 * ONE_64); //0.75f, 0.05f, 0.75f);
+		Vector3f scale = new Vector3f(48 * Constants.ONE_64, 48 * Constants.ONE_64, 5 * Constants.ONE_64); //0.75f, 0.05f, 0.75f);
 		boolean isUp = ifh.attachedFace.getOppositeFace() == BlockFace.UP;
 		Vector3f attachOffset = null;
 		MaterializedBlock mb = null;
@@ -796,7 +803,7 @@ public class Ship {
 
 		if(ifh.visible) {
 			//frame
-			attachOffset = new Vector3f(-24 * ONE_64, 0, -24 * ONE_64);
+			attachOffset = new Vector3f(-24 * Constants.ONE_64, 0, -24 * Constants.ONE_64);
 
 			Matrix4f frameXform = UtilFuncs.createCustomTransformItem(ifh.frameOffset, ifh.attachedFace.getOppositeFace(), shipYaw, scale, attachOffset);
 		
@@ -815,8 +822,8 @@ public class Ship {
 			shipBlocks.add(mb);
 
 			///background
-			scale = new Vector3f(40 * ONE_64, 40 * ONE_64, 5 * ONE_64);    //0.06125
-			attachOffset = new Vector3f(-20 * ONE_64, isUp ? ONE_64/4.0f : ONE_64/-4.0f, -20 * ONE_64);
+			scale = new Vector3f(40 * Constants.ONE_64, 40 * Constants.ONE_64, 5 * Constants.ONE_64);    //0.06125
+			attachOffset = new Vector3f(-20 * Constants.ONE_64, isUp ? Constants.ONE_64/4.0f : Constants.ONE_64/-4.0f, -20 * Constants.ONE_64);
 			Matrix4f backgroundXform = UtilFuncs.createCustomTransformItem(ifh.frameOffset, ifh.attachedFace.getOppositeFace(), shipYaw, scale, attachOffset);
 		
 			Display theBackground = ifh.loc.getWorld().spawn(helmAnchor.getLocation().clone(), BlockDisplay.class, bd -> {
@@ -839,8 +846,8 @@ public class Ship {
 			return;
 		}
 
-		scale = new Vector3f(34*ONE_64,34*ONE_64, 34*ONE_64);
-		attachOffset = new Vector3f(0, isUp ? ONE_64 : -5 * ONE_64, 0);
+		scale = new Vector3f(34*Constants.ONE_64,34*Constants.ONE_64, 34*Constants.ONE_64);
+		attachOffset = new Vector3f(0, isUp ? Constants.ONE_64 : -5 * Constants.ONE_64, 0);
 		Matrix4f itemXform = UtilFuncs.createCustomTransformItem(ifh.frameOffset, ifh.attachedFace.getOppositeFace(), shipYaw, scale, attachOffset, ifh.rotation);
 		Display theContents = ifh.loc.getWorld().spawn(helmAnchor.getLocation().clone(), ItemDisplay.class, bd -> {
 				bd.setItemStack(ifh.itemStack.clone());
@@ -869,11 +876,11 @@ public class Ship {
 			
 		if(ifh.visible == true ) {
 			//render the fake frame
-			scale = new Vector3f(48 * ONE_64, 48 * ONE_64, 4 * ONE_64); //0.05f);
+			scale = new Vector3f(48 * Constants.ONE_64, 48 * Constants.ONE_64, 4 * Constants.ONE_64); //0.05f);
 				
-			attachOffset = new Vector3f(wallOffset.x == 0 ? wallOffset.z * (-24 * ONE_64) : wallOffset.x > 0 ? (-3 * ONE_64) : (3 * ONE_64),   //-0.025f : 0.025f,
-																	wallOffset.y - (27 * ONE_64),
-																	wallOffset.z == 0 ? wallOffset.x * (24 * ONE_64) : wallOffset.z > 0 ? (-3 * ONE_64) : (3 * ONE_64));   //-0.025f : 0.025f);
+			attachOffset = new Vector3f(wallOffset.x == 0 ? wallOffset.z * (-24 * Constants.ONE_64) : wallOffset.x > 0 ? (-3 * Constants.ONE_64) : (3 * Constants.ONE_64),   //-0.025f : 0.025f,
+																	wallOffset.y - (27 * Constants.ONE_64),
+																	wallOffset.z == 0 ? wallOffset.x * (24 * Constants.ONE_64) : wallOffset.z > 0 ? (-3 * Constants.ONE_64) : (3 * Constants.ONE_64));   //-0.025f : 0.025f);
 			Matrix4f frameXform = UtilFuncs.createCustomTransformItem(ifh.frameOffset, ifh.attachedFace.getOppositeFace(), shipYaw, scale, attachOffset);
 				
 			Display theFrame = ifh.loc.getWorld().spawn(helmAnchor.getLocation().clone(), BlockDisplay.class, bd -> {
@@ -891,10 +898,10 @@ public class Ship {
 			shipBlocks.add(mb);
 				
 			
-			scale = new Vector3f(40 * ONE_64, 40 * ONE_64, 4 * ONE_64);
-			attachOffset = new Vector3f(wallOffset.x == 0 ? wallOffset.z * (-20 * ONE_64) : wallOffset.x > 0 ? (-2.95f * ONE_64) : (2.95f * ONE_64),
-																	wallOffset.y - (23 * ONE_64),
-																	wallOffset.z == 0 ? wallOffset.x * (20 * ONE_64) : wallOffset.z > 0 ? (-2.95f * ONE_64) : (2.95f * ONE_64));
+			scale = new Vector3f(40 * Constants.ONE_64, 40 * Constants.ONE_64, 4 * Constants.ONE_64);
+			attachOffset = new Vector3f(wallOffset.x == 0 ? wallOffset.z * (-20 * Constants.ONE_64) : wallOffset.x > 0 ? (-2.95f * Constants.ONE_64) : (2.95f * Constants.ONE_64),
+																	wallOffset.y - (23 * Constants.ONE_64),
+																	wallOffset.z == 0 ? wallOffset.x * (20 * Constants.ONE_64) : wallOffset.z > 0 ? (-2.95f * Constants.ONE_64) : (2.95f * Constants.ONE_64));
 			Matrix4f backgroundXform = UtilFuncs.createCustomTransformItem(ifh.frameOffset, ifh.attachedFace.getOppositeFace(), shipYaw, scale, attachOffset);
 				
 			Display theBackground = ifh.loc.getWorld().spawn(helmAnchor.getLocation().clone(), BlockDisplay.class, bd -> {
@@ -917,10 +924,10 @@ public class Ship {
 			return;
 		}
 
-		scale = new Vector3f(34*ONE_64,34*ONE_64, 34*ONE_64);
-		attachOffset = new Vector3f(wallOffset.x == 0 ? 0 : wallOffset.x > 0 ? (2 * ONE_64) : (-2 * ONE_64),
-																wallOffset.y - (2.0f * ONE_64),
-																wallOffset.z == 0 ? 0 : wallOffset.z > 0 ? (2 * ONE_64) : (-2 * ONE_64));
+		scale = new Vector3f(34*Constants.ONE_64,34*Constants.ONE_64, 34*Constants.ONE_64);
+		attachOffset = new Vector3f(wallOffset.x == 0 ? 0 : wallOffset.x > 0 ? (2 * Constants.ONE_64) : (-2 * Constants.ONE_64),
+																wallOffset.y - (2.0f * Constants.ONE_64),
+																wallOffset.z == 0 ? 0 : wallOffset.z > 0 ? (2 * Constants.ONE_64) : (-2 * Constants.ONE_64));
 		Matrix4f itemXform = UtilFuncs.createCustomTransformItem(ifh.frameOffset, ifh.attachedFace.getOppositeFace(), shipYaw, scale, attachOffset, ifh.rotation);
 		Display theContents = ifh.loc.getWorld().spawn(helmAnchor.getLocation().clone(), ItemDisplay.class, bd -> {
 				bd.setItemStack(ifh.itemStack.clone());
@@ -1108,9 +1115,9 @@ public class Ship {
 			for(ItemStack item : inventoryContents ) {
 				//I think these go in order, left to right.
 				if( item != null ) {
-					Vector3f translation = new Vector3f(offset.x - (itemOffset.x *  (14 * ONE_64)) + (itemOffset.z * (slot * (20 * ONE_64))),
+					Vector3f translation = new Vector3f(offset.x - (itemOffset.x *  (14 * Constants.ONE_64)) + (itemOffset.z * (slot * (20 * Constants.ONE_64))),
 																				offset.y - SHIP_VERTICAL_OFFSET + 0.5f,
-																				offset.z - (itemOffset.z * (14 * ONE_64)) - (itemOffset.x * (slot * (20 * ONE_64))));
+																				offset.z - (itemOffset.z * (14 * Constants.ONE_64)) - (itemOffset.x * (slot * (20 * Constants.ONE_64))));
 					SimpleShipsPlugin.log(0,"Adding item %s to slot %d translation (%f,%f,%f)  off(%f,%f,%f)",
 																item.getType(),
 																slot,
@@ -1128,7 +1135,7 @@ public class Ship {
 					 	.rotate(shipRot)
 					 	.translate(translation)
 						.rotateY((float)Math.toRadians(itemRotation))
-					 	.scale(16 * ONE_64);
+					 	.scale(16 * Constants.ONE_64);
 				 
 
 					ItemStack matItem = item.clone();
@@ -1365,6 +1372,13 @@ public class Ship {
 			entityPads.add(new EntityPadHandle(pad, localOffset));
 		}
 	}
+	private void captureParrotPerch(Location standLoc, ArmorStand stand) {
+		SimpleShipsPlugin.log(0,"Found enitity perch at (%f,%f,%f)", standLoc.getX(), standLoc.getY(), standLoc.getZ());
+		ParrotPerch perch = EntityManager.getParrotPerch(stand.getPersistentDataContainer().get(Constants.PARROT_PERCH_ID_KEY, PersistentDataType.STRING));
+		if( perch != null ) {
+			parrotPerchs.add(new ParrotPerchHandle(perch, helmAnchor.getLocation(), shipYawAtAssemble));
+		}
+	}
 	private void capturePassengerSeat(Location standLoc, ArmorStand stand) {
 		SimpleShipsPlugin.log(0,"Found passenger seat at (%f,%f,%f)", standLoc.getX(), standLoc.getY(), standLoc.getZ());
 		PassengerSeat pseat = EntityManager.getPassengerSeat(stand.getPersistentDataContainer().get(Constants.PASSENGER_SEAT_ID_KEY, PersistentDataType.STRING));
@@ -1411,6 +1425,10 @@ public class Ship {
 					SimpleShipsPlugin.log(0,"Entity pad");
 					captureEntityPad(eloc,stand);
 					continue;
+				}
+				if(ParrotPerch.isParrotPerch(stand)) {
+					SimpleShipsPlugin.log(0,"Parrot perch");
+					captureParrotPerch(eloc, stand);
 				}
 				if(PassengerSeat.isPassengerSeat(stand)) {
 					SimpleShipsPlugin.log(0,"Passenger Seat");

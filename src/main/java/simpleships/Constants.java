@@ -13,6 +13,7 @@ import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
 
 public class Constants {
+	static public final float ONE_64 = 1.0f/64.0f;
 	static public final int BD_TELEPORT_DURATION  = 3;
 	static public final int BD_LERP_DURATION      = 0;
 	static public final int UPDATE_TICKS          = 1;
@@ -37,6 +38,14 @@ public class Constants {
 	static public final NamespacedKey ENTITY_PAD_ID_KEY = new NamespacedKey(NAME_SPACE, "entity_pad_item_key");
 	static public final NamespacedKey ENTITY_PAD_RECIPE_KEY = new NamespacedKey(NAME_SPACE, "entity_pad_recipe");
 	static public final String ENTITY_PAD_ID = "entity_pad_id";
+
+	static public final String PARROT_PERCH_ITEM_TYPE = "parrot_perch_item";
+	static public final String PARROT_PERCH_POST_ITEM_TYPE = "parrot_perch_post_item";
+	static public final String PARROT_PERCH_CROSSBAR_ITEM_TYPE = "parrot_perch_crossbar_item";
+	static public final NamespacedKey PARROT_PERCH_ID_KEY = new NamespacedKey(NAME_SPACE, "parrot_perch_item_key");
+	static public final NamespacedKey PARROT_PERCH_RECIPE_KEY = new NamespacedKey(NAME_SPACE, "parrot_perch_recipe");
+	static public final String PARROT_PERCH_ID = "parrot_perch_id";
+	
 
 	static public final String PASSENGER_SEAT_ITEM_TYPE = "passenger_seat_item";
 	static public final String PASSENGER_SEAT_CUSHION_ITEM_TYPE = "passenger_seat_cushion_item";

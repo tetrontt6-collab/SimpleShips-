@@ -104,6 +104,10 @@ public class SimpleShipsPlugin extends JavaPlugin {
 			PassengerSeat.giveSeatToPlayer(player);
 		}
 	
+		if( commandName.equalsIgnoreCase("perch")) {
+			ParrotPerch.givePerchToPlayer(player);
+		}
+	
 		return true;
 	}
 
@@ -163,7 +167,7 @@ public class SimpleShipsPlugin extends JavaPlugin {
 		
 		ItemStack passengerSeat = PassengerSeat.createPassengerSeatItemStack();
 		if( passengerSeat == null ) {
-			logger.severe("Failed to create the entity pad recipe");
+			logger.severe("Failed to create the passenger seat recipe");
 		} else {
 			ShapedRecipe passengerSeatRecipe = new ShapedRecipe(Constants.PASSENGER_SEAT_RECIPE_KEY, passengerSeat);
 			passengerSeatRecipe.shape(".Y.",
@@ -173,6 +177,18 @@ public class SimpleShipsPlugin extends JavaPlugin {
 			passengerSeatRecipe.setIngredient('S', new RecipeChoice.MaterialChoice(Tag.WOODEN_STAIRS));
 			passengerSeatRecipe.setIngredient('I', Material.IRON_INGOT);
 			Bukkit.addRecipe(passengerSeatRecipe);
+		}
+
+		ItemStack parrotPerch = ParrotPerch.createParrotPerchItemStack();
+		if( parrotPerch == null) {
+			logger.severe("Failed to create the parrot perch recipe");
+		} else {
+			ShapedRecipe parrotPerchRecipe = new ShapedRecipe(Constants.PARROT_PERCH_RECIPE_KEY, parrotPerch);
+			parrotPerchRecipe.shape("SSS",
+															".S.",
+															".S.");
+			parrotPerchRecipe.setIngredient('S',Material.STICK);
+			Bukkit.addRecipe(parrotPerchRecipe);
 		}
 	}
 

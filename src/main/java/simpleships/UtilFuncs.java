@@ -50,6 +50,24 @@ public class UtilFuncs {
 		};
 	}
 
+	//this gets the closest facing direction for the given yaw
+	static final public float getClosestFacingYawDegrees(float yaw) {
+		float n = yaw % 360.0f;
+		if( n < 0.0f ) {
+			n += 360.0f;
+		}
+
+		float d = 22.5f / 2.0f;
+		for(float y = 0; y < 360.f; y += 22.5f) {
+			if( n >= y && n < (y + d)) {
+				return y;
+			}
+			if( n >= (y + d) && n < (y + (2*d)))
+				return (y + (2*d));
+		}
+		return 0.0f;
+	}
+	
 	//this returns the exact degrees for each face
 	static final public float getYawDegrees(BlockFace face) {
 		if( face != null ) {
@@ -150,6 +168,7 @@ public class UtilFuncs {
 		}
 		return 270;
 	}
+
 
 	//ensure the angle is in the range -180 -> 180 which
 	//is how Minecraft does its internal yaws

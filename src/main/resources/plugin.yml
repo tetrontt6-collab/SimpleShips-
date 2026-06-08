@@ -7,19 +7,22 @@ description: A Simple Ships plugin
 commands:
   cleanup:
     description: Remove all ship components parts
-    usage: "/simpleships cleanup"
+    usage: "/simpleshipsplugin cleanup"
   helm:
     description: Give player a helm
-    usage: "/simpleships helm"
+    usage: "/simpleshipsplugin helm"
   pad:
     description: Give player an entity pad
-    usage: "/simpleships pad"
+    usage: "/simpleshipsplugin pad"
   seat:
     description: Give player a passenger seat
-    usage: "/simpleships seat"
+    usage: "/simpleshipsplugin seat"
+  perch:
+    description: Give player a parrot perch
+    usage: "/simpleshipsplugin perch"
   flush:
     description: Flush all ships and components
-    usage: "/simpleships flush"
+    usage: "/simpleshipsplugin flush"
     
 
 

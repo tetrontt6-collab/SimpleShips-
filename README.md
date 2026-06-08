@@ -24,10 +24,13 @@ Build a ship, place a helm, gather your crew, and set sail.
 * Survival-friendly recipes
 * Passenger seats for other players
 * Entity pads for animals and villagers
+* Dedicated parrot perches
+* Moving respawn points for shipboard beds
 * Collision detection while sailing
 * Reverse movement to help maneuver out of tight spaces
 * Ship persistence across chunk loads and server restarts
 * Lightweight implementation using supported Paper APIs only
+
 
 ### Supported Decorative Features
 
@@ -46,8 +49,32 @@ SimpleShips preserves many decorative elements while ships are materialized:
 * Beds
 * Campfires
 * Light sources
+* Shelves
+* Chiseled Bookshelves
 
 Inventories and most block state information are restored automatically when ships disassemble.
+
+---
+
+## Living Aboard Your Ship
+
+SimpleShips is designed to support long-term exploration and life at sea.  Beds, storage, companions, and many decorative elements can travel with your ship, allowing vessels to become true mobile homes.
+
+### Moving Respawn Points
+
+If a player sets their respawn point using a bed aboard a ship, SimpleShips will automatically move that respawn point when the ship rematerializes.
+
+This allows captains and passengers to treat their vessel as a true mobile home. If disaster strikes while exploring distant oceans, players can respawn aboard their ship rather than returning to a distant land-based base.
+
+### Ship Companions
+
+SimpleShips supports bringing companions along for the voyage.
+
+* Passenger Seats allow other players to travel aboard your vessel.
+* Entity Pads allow animals and villagers to travel safely while underway.
+* Parrot Perches provide a dedicated place for parrots to ride aboard ships.
+
+Whether you travel alone, with friends, or with a loyal crew of pets and companions, your ship can become a living part of your world.
 
 ---
 
@@ -119,8 +146,7 @@ The `debug` parameter will cause extra messages to be generated in the server lo
 ## Ship Components
 
 There are various components available for use with the ship, the primary being the **Helm**.
-To carry non-player living entities, there is the **Entity Pad** and to allow your companions to
-ride along, there is the **Passenger Seat**.
+To carry non-player living entities, there is the **Entity Pad**. To allow other players to travel aboard your vessel, there is the **Passenger Seat** and for avian companions, there is the **Parrot Perch**.
 
 When placing the **Helm**, it is necessary to be facing in the direction considered to be the front of the
 ship as the direction the player is facing at the time of placement determines what direction is `forward`.
@@ -131,12 +157,15 @@ To use the **Helm** or **Passenger Seat**, simply right-click and the player wil
 **Helm** the ship is assembled into Display entities and any entities or players standing on the ship will
 fall through the ship, so make sure your companions and pets are seated before the captain takes the helm.
 
-The **Entity Pads** are used by simply right clicking as well, but what they will do is scan the area around the pad for
-any nearby living entity (excluding players, armor stands, and water mobs) and will mount that entity onto the pad. 
+The **Entity Pad** is used by simply right-clicking. It will scan the area around the pad for a nearby living entity (excluding players, armor stands, and water mobs) and mount that entity onto the pad.
+
+The **Parrot Perch** is a decorative ship component designed specifically for parrots. Right-click the perch while near a parrot 
+and it will take up residence aboard your vessel. Parrots remain attached while the ship is underway and travel with the vessel.
+
 
 Unmounting a **Helm** or **Passenger Seat** is the standard unmount option.
 
-To detach the entity from the **Entity Pad**, `sneak-right click` on the entity or the pad.
+To detach the entity from the **Entity Pad** or **Parrot Perch**, `sneak-right click` on the entity or the pad.
 
 ---
 
@@ -150,9 +179,9 @@ in the direction considered the front of the ship as that will be considered
 the direction of movement.
 
 ```text
-[][ Spruce Trapdoor ][]
-[][   Spruce Fence  ][]
-[][    Iron Ingot   ][]
+[][ Any Wooden Trapdoor ][]
+[][   Any Wooden Fence  ][]
+[][      Iron Ingot     ][]
 ```
 
 ### Passenger Seat
@@ -160,9 +189,9 @@ the direction of movement.
 Allows other players to ride aboard ships.
 
 ```text
-[][  Yellow Carpet  ][]
-[][ Mangrove Stairs ][]
-[][    Iron Ingot   ][]
+[][    Any Carpet    ][]
+[][ Any Wooden Stair ][]
+[][    Iron Ingot    ][]
 ```
 
 ### Entity Pad
@@ -170,9 +199,19 @@ Allows other players to ride aboard ships.
 Allows animals and villagers to travel aboard ships.
 
 ```text
-[][      Hay Bale   ][]
-[][    Oak Fence    ][]
-[][    Iron Ingot   ][]
+[][      Hay Bale    ][]
+[][ Any Wooden Fence ][]
+[][    Iron Ingot    ][]
+```
+
+### Parrot Perch
+
+Allows parrots to travel in style aboard ships.
+
+```text
+[Stick][Stick][Stick]
+[     ][Stick][     ]
+[     ][Stick][     ]
 ```
 
 ---
@@ -229,6 +268,7 @@ Note that when the pilot dismounts, the ship rematerializes back into world bloc
 | `/simpleshipsplugin:helm` | Gives the player a ship helm |
 | `/simpleshipsplugin:seat` | Gives the player a passenger seat |
 | `/simpleshipsplugin:pad` | Gives the player an entity pad |
+| `/simpleshipsplugin:perch` | Gives the player a parrot perch |
 | `/simpleshipsplugin:flush` | Forces all active ships to rematerialize |
 
 ### Beta Note
@@ -246,7 +286,6 @@ These commands exist primarily as recovery/debugging tools while the plugin cont
 * Very large ships may occasionally show minor visual interpolation gaps during movement
 * Reverse movement intentionally ignores collision checks to help ships escape tight spaces
 * Ships currently operate on water only
-* Decorative armor stands, player heads and item frames are supported
 
 
 ---

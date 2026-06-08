@@ -1,3 +1,4 @@
+
 package simpleships;
 /*
  * SimpleShips
@@ -21,6 +22,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Interaction;
 import org.bukkit.entity.ItemDisplay;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Parrot;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.WaterMob;
 import org.bukkit.event.EventHandler;
@@ -41,6 +43,7 @@ import org.bukkit.persistence.PersistentDataType;
  */
 public class EntityManager implements Listener {
 	static Set<EntityPad> entityPads = new HashSet<>();
+	static Set<ParrotPerch> parrotPerchs = new HashSet<>();
 	static Set<PassengerSeat> passengerSeats = new HashSet<>();
 	final SimpleShipsPlugin plugin;
 	final HelmListener helmListener;
@@ -50,41 +53,84 @@ public class EntityManager implements Listener {
 		this.helmListener = helmListener;
 	}
 
-	public void rehydrateEntities() {
-		for(World world : Bukkit.getWorlds()) {
-			for( Interaction inter : world.getEntitiesByClass(Interaction.class)) {
-				if(EntityPad.isEntityPadInteraction(inter)) {
-					EntityPad pad = EntityPad.findPad(inter);
-					if( pad != null ) {
-						entityPads.add(pad);
-					} else {
-						Location l = inter.getLocation();
-						SimpleShipsPlugin.log(1,"Found orphaned entity pad at (%f,%f,%f)", l.getX(), l.getY(), l.getZ());
-					}
+	protected void checkForShipEntity(Entity entity) {
+		if( entity instanceof ArmorStand stand ) {
+			SimpleShipsPlugin.log(0,"checking armor stand of type a %s", entity.getPersistentDataContainer().get(Constants.ITEM_TYPE_KEY, PersistentDataType.STRING));
+			if(HelmSeat.isHelmSeat(stand)) {
+				helmListener.onChunkLoad(stand);
+			} else if(PassengerSeat.isPassengerSeat(stand)) {
+				PassengerSeat seat = PassengerSeat.findSeat(stand);
+				if( seat != null ) {
+					passengerSeats.add(seat);
+				} else {
+					Location l = stand.getLocation();
+					SimpleShipsPlugin.log(1,"Found orphaned passenger seat at (%f,%f,%f)", l.getX(), l.getY(), l.getZ());
+				}
+			} else if(ParrotPerch.isParrotPerch(stand)) {
+				ParrotPerch perch = ParrotPerch.findParrotPerch(stand);
+				Location l = stand.getLocation();
+				if( perch != null ) {
+					SimpleShipsPlugin.log(0, "Found parrot perch at (%f,%f,%f)", l.getX(), l.getY(), l.getZ());
+					parrotPerchs.add(perch);
+				} else {
+					SimpleShipsPlugin.log(1,"Found orphaned parrot perch at (%f,%f,%f)", l.getX(), l.getY(), l.getZ());
 				}
 			}
-			for(ArmorStand stand : world.getEntitiesByClass(ArmorStand.class)) {
-				if(PassengerSeat.isPassengerSeat(stand)) {
-					PassengerSeat seat = PassengerSeat.findSeat(stand);
-					if( seat != null ) {
-						passengerSeats.add(seat);
-					} else {
-						Location l = stand.getLocation();
-						SimpleShipsPlugin.log(1,"Found orphaned passenger seat at (%f,%f,%f)", l.getX(), l.getY(), l.getZ());
-					}
-					
+		} else if( entity instanceof Interaction inter) {
+			SimpleShipsPlugin.log(0,"checking interaction of type a %s", entity.getPersistentDataContainer().get(Constants.ITEM_TYPE_KEY, PersistentDataType.STRING));
+			if(EntityPad.isEntityPadInteraction(inter)) {
+				EntityPad pad = EntityPad.findPad(inter);
+				if( pad != null ) {
+					entityPads.add(pad);
+				} else {
+					Location l = inter.getLocation();
+					SimpleShipsPlugin.log(1,"Found orphaned entity pad at (%f,%f,%f)", l.getX(), l.getY(), l.getZ());
 				}
 			}
 		}
 	}
+
+	@EventHandler
+	public void onChunkLoad(ChunkLoadEvent event) {
+		for(Entity entity : event.getChunk().getEntities()) {
+			checkForShipEntity(entity);
+		}
+	}
+	
+	public void rehydrateEntities() {
+		SimpleShipsPlugin.log(0,"Rehydrating");
+		for(World world : Bukkit.getWorlds()) {
+			for( Interaction inter : world.getEntitiesByClass(Interaction.class)) {
+				checkForShipEntity(inter);
+			}
+			for(ArmorStand stand : world.getEntitiesByClass(ArmorStand.class)) {
+				checkForShipEntity(stand);
+			}
+		}
+	}
+
+	static public Parrot findNearestParrotNotInVehicle(Player player, Location center, double radius) {
+		LivingEntity entity = findNearestLivingEntityNotInVehicle(player, center, radius, true);
+		if( entity != null && (entity instanceof Parrot parrot))
+			return parrot;
+		return null;
+	}
 	
 	static public LivingEntity findNearestLivingEntityNotInVehicle(Player player, Location center, double radius) {
+		return findNearestLivingEntityNotInVehicle(player, center, radius, false);
+	}
+	static public LivingEntity findNearestLivingEntityNotInVehicle(Player player, Location center, double radius, boolean onlyParrots) {
 		LivingEntity best = null;
 		double bestDistance = radius * radius;
 
 		for(Entity entity : center.getWorld().getNearbyEntities(center, radius, radius, radius)) {
 			if(!(entity instanceof LivingEntity living)) {
 				continue;
+			}
+			if( onlyParrots) {
+				if(!(entity instanceof Parrot parrot)) {
+					continue;
+				}
 			}
 			if( living instanceof WaterMob) {
 				continue;
@@ -141,6 +187,40 @@ public class EntityManager implements Listener {
 		}
 	}
 
+	//==============Parrot Perchs==================//
+	static public void addParrotPerch(ParrotPerch perch) {
+		parrotPerchs.add(perch);
+	}
+	static ParrotPerch getParrotPerch(UUID uuid) {
+		if( uuid != null)
+			return getParrotPerch(uuid.toString());
+		return null;
+	}
+	static ParrotPerch getParrotPerch(String id) {
+		if(id == null)
+			return null;
+		for(ParrotPerch perch : parrotPerchs) {
+			if( id.equals(perch.getPerchIdStr())) {
+				return perch;
+			}
+		}
+		return null;
+	}
+	static public void removeParrotPerch(ParrotPerch perch) {
+		if( perch != null )
+			parrotPerchs.remove(perch);
+	}
+	
+	static public void removeParrotPerch(String id) {
+		if(id == null )
+			return;
+		ParrotPerch toRemove = getParrotPerch(id);
+		if( toRemove != null ) {
+			toRemove.removeFromWorld();
+			parrotPerchs.remove(toRemove);
+		}
+	}
+	
 	//==============PassengerSeats Pads==================//
 	static public void addPassengerSeat(PassengerSeat pad) {
 		passengerSeats.add(pad);
@@ -223,6 +303,9 @@ public class EntityManager implements Listener {
 			} else if(PassengerSeat.isPassengerSeat(stand)) {
 				event.setCancelled(true);
 				PassengerSeat.onStandClicked(event.getPlayer(), stand, event);
+			} else if(ParrotPerch.isParrotPerch(stand)) {
+				event.setCancelled(true);
+				ParrotPerch.onStandClicked(event.getPlayer(), stand, event);
 			}
 		}
 
@@ -250,6 +333,9 @@ public class EntityManager implements Listener {
 					event.setCancelled(true);
 				} else if(PassengerSeat.isPassengerSeat(stand)) {
 					PassengerSeat.onEntityHit(player, stand, event);
+					event.setCancelled(true);
+				} else if(ParrotPerch.isParrotPerch(stand)) {
+					ParrotPerch.onPerchHit(player, stand, event);
 					event.setCancelled(true);
 				}
 			}
@@ -288,31 +374,12 @@ public class EntityManager implements Listener {
 		} else if( PassengerSeat.isPassengerSeat(type) ) {
 			event.setCancelled(true);
 			PassengerSeat.onPlayerPlaceEntity(event, item);
+		} else if(ParrotPerch.isParrotPerch(type)) {
+			event.setCancelled(true);
+			ParrotPerch.onPlayerPlacePerch(event, item);
 		}
 	}
 
-	@EventHandler
-	public void onChunkLoad(ChunkLoadEvent event) {
-		for(Entity entity : event.getChunk().getEntities()) {
-			if( entity instanceof ArmorStand stand ) {
-				if(HelmSeat.isHelmSeat(stand)) {
-					helmListener.onChunkLoad(stand);
-				} else if(PassengerSeat.isPassengerSeat(stand)) {
-					PassengerSeat seat = PassengerSeat.findSeat(stand);
-					if( seat != null ) {
-						passengerSeats.add(seat);
-					}
-				}
-			} else if( entity instanceof Interaction inter) {
-				if(EntityPad.isEntityPadInteraction(inter)) {
-					EntityPad pad = EntityPad.findPad(inter);
-					if( pad != null ) {
-						entityPads.add(pad);
-					}
-				}
-			}
-		}
-	}
 
 	public void flushAll() {
 		for(EntityPad pad : entityPads ) {
@@ -324,6 +391,11 @@ public class EntityManager implements Listener {
 			seat.removeFromWorld();
 		}
 		passengerSeats.clear();
+
+		for(ParrotPerch perch : parrotPerchs) {
+			perch.removeFromWorld();
+		}
+		parrotPerchs.clear();
 	}
 
 	/**
