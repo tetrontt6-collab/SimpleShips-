@@ -62,7 +62,7 @@ public class SimpleShipsPlugin extends JavaPlugin {
 			}
 		}.runTaskTimer(this, 0, Constants.UPDATE_TICKS);
 		
-		log(0,"Simple Ships  plugin startup, version 1.0.1");
+		log(0,"Simple Ships  plugin startup");
 	}
 
 	@Override
