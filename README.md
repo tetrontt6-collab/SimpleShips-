@@ -279,13 +279,33 @@ Note that when the pilot dismounts, the ship rematerializes back into world bloc
 | `/simpleshipsplugin:perch` | Gives the player a parrot perch |
 | `/simpleshipsplugin:flush` | Forces all active ships to rematerialize |
 
-### Beta Note
+### Permissions
+```
+simpleships.cleanup.use:
+  description: Allow use of the cleanup command
+  default: op
+  
+simpleships.flush.use:
+  description: Allow use of the flush command
+  default: op
+  
+simpleships.helm.use:
+  description: Allow use of the helm spawn command
+  default: op
+  
+simpleships.seat.use:
+  description: Allow use of the seat spawn command
+  default: op
+  
+simpleships.pad.use:
+  description: Allow use of the pad spawn command
+  default: op
+  
+simpleships.perch.use:
+  description: Allow use of the perch spawn command
+  default: op
+```
 
-At the moment, commands are intentionally unrestricted during the beta phase.
-
-This means any player with access to commands can currently execute `/simpleshipsplugin:flush` and `/simpleshipsplugin:cleanup`, which forces all active ships to align and rematerialize and all ship components to be removed, respectively.
-
-These commands exist primarily as recovery/debugging tools while the plugin continues to mature and may become permission-restricted in a future release.
 
 ---
 ## Notes
