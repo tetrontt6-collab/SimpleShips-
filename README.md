@@ -329,7 +329,7 @@ For best results, build ships as surface vessels with no enclosed dry rooms belo
 
 ## Current Status
 
-SimpleShips has reached a 1.0 relese, but the project is still actively developed and used in real survival gameplay.
+SimpleShips has reached a 1.0 release, but the project is still actively developed and used in real survival gameplay.
 
 The plugin is fully playable and actively used in survival gameplay, but there may still be occasional edge cases or issues during chunk loading, server restart recovery, or unusual builds.
 
