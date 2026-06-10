@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0
+* Added permission checks to the available commands
+
 ## 0.9.11-beta
 
 * Modified helm recipe to work with any wooden trapdoor and wooden fence post
