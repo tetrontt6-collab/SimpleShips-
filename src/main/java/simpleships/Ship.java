@@ -1435,7 +1435,7 @@ public class Ship {
 					capturePassengerSeat(eloc, stand);
 					continue;
 				}
-				SimpleShipsPlugin.log(0,"ArmorStand is not a ship compoment, capturing");
+				SimpleShipsPlugin.log(0,"ArmorStand at(%f,%f,%f) is not a ship compoment, capturing", eloc.getX(), eloc.getY(), eloc.getZ());
 				armorStands.add(new ArmorStandHandle(stand, anchor, shipYawAtAssemble));
 			}
 			if(Constants.isShipComponent(entity)) {

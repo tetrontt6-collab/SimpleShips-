@@ -54,8 +54,15 @@ public class EntityManager implements Listener {
 	}
 
 	protected void checkForShipEntity(Entity entity) {
+		String id = entity.getPersistentDataContainer().get(Constants.ITEM_TYPE_KEY, PersistentDataType.STRING);
+		Location entityLocation = entity.getLocation();
+			
 		if( entity instanceof ArmorStand stand ) {
-			SimpleShipsPlugin.log(0,"checking armor stand of type a %s", entity.getPersistentDataContainer().get(Constants.ITEM_TYPE_KEY, PersistentDataType.STRING));
+			if( id == null ) {
+//				SimpleShipsPlugin.log(0,"Armor stand at (%f,%f,%f) is not a ship component", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
+				return;
+			}
+			
 			if(HelmSeat.isHelmSeat(stand)) {
 				helmListener.onChunkLoad(stand);
 			} else if(PassengerSeat.isPassengerSeat(stand)) {
@@ -63,28 +70,29 @@ public class EntityManager implements Listener {
 				if( seat != null ) {
 					passengerSeats.add(seat);
 				} else {
-					Location l = stand.getLocation();
-					SimpleShipsPlugin.log(1,"Found orphaned passenger seat at (%f,%f,%f)", l.getX(), l.getY(), l.getZ());
+					SimpleShipsPlugin.log(1,"Found orphaned passenger seat at (%f,%f,%f)", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
 				}
 			} else if(ParrotPerch.isParrotPerch(stand)) {
 				ParrotPerch perch = ParrotPerch.findParrotPerch(stand);
-				Location l = stand.getLocation();
 				if( perch != null ) {
-					SimpleShipsPlugin.log(0, "Found parrot perch at (%f,%f,%f)", l.getX(), l.getY(), l.getZ());
+					SimpleShipsPlugin.log(0, "Found parrot perch at (%f,%f,%f)", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
 					parrotPerchs.add(perch);
 				} else {
-					SimpleShipsPlugin.log(1,"Found orphaned parrot perch at (%f,%f,%f)", l.getX(), l.getY(), l.getZ());
+					SimpleShipsPlugin.log(1,"Found orphaned parrot perch at (%f,%f,%f)", entity.getX(), entity.getY(), entity.getZ());
 				}
 			}
 		} else if( entity instanceof Interaction inter) {
-			SimpleShipsPlugin.log(0,"checking interaction of type a %s", entity.getPersistentDataContainer().get(Constants.ITEM_TYPE_KEY, PersistentDataType.STRING));
+			if( id == null ) {
+				SimpleShipsPlugin.log(0,"Interaction at (%f,%f,%f) is not a ship component", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
+				return;
+			}
+
 			if(EntityPad.isEntityPadInteraction(inter)) {
 				EntityPad pad = EntityPad.findPad(inter);
 				if( pad != null ) {
 					entityPads.add(pad);
 				} else {
-					Location l = inter.getLocation();
-					SimpleShipsPlugin.log(1,"Found orphaned entity pad at (%f,%f,%f)", l.getX(), l.getY(), l.getZ());
+					SimpleShipsPlugin.log(1,"Found orphaned entity pad at (%f,%f,%f)", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
 				}
 			}
 		}
