@@ -36,6 +36,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import static simpleships.SimpleShipsPlugin.LOG;
+
 /**
  * The HelmListener is responsible for most of the management
  * of a ship's helm and for the player input and events.
@@ -52,7 +54,7 @@ public class HelmListener implements Listener {
 	
 
 	public void flushAll() {
-		SimpleShipsPlugin.log(0,"Flushing all");
+		LOG(0,"Flushing all");
 		for(Ship ship : shipById.values()) {
 			ship.forceUnmount();
 		}
@@ -74,7 +76,7 @@ public class HelmListener implements Listener {
 
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent evt) {
-		SimpleShipsPlugin.log(0,"Player died, restoring ship ");
+		LOG(0,"Player died, restoring ship ");
 		Player player = evt.getPlayer();
 		if( player == null )
 			return;
@@ -85,7 +87,7 @@ public class HelmListener implements Listener {
 
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 				ship.forceUnmount();
-				SimpleShipsPlugin.log(0,"Unmounting player");
+				LOG(0,"Unmounting player");
 			}, 5L);
 	}
 
@@ -98,11 +100,11 @@ public class HelmListener implements Listener {
 
 
 		if( !BlockSupport.isBlockAllowedForHelm(block.getType())) {
-			SimpleShipsPlugin.log(0, player, "Helm must be placed on an allowed block");
+			LOG(0, player, "Helm must be placed on an allowed block");
 			return;
 		}
 		if( BlockSupport.isLowerSlab(block)) {
-			SimpleShipsPlugin.log(0, player, "Helm can not be placed on a lower slab");
+			LOG(0, player, "Helm can not be placed on a lower slab");
 			return;
 		}
 			
@@ -136,7 +138,7 @@ public class HelmListener implements Listener {
 		Ship ship = shipById.get(shipHelmId);
 		Location standLoc = stand.getLocation().clone();
 		if(ship == null ) {
-			SimpleShipsPlugin.log(1,player,"Problem with helm, no ship associated with it.  Pickup and replace");
+			LOG(1,player,"Problem with helm, no ship associated with it.  Pickup and replace");
 			return;
 		}
 		
@@ -154,7 +156,7 @@ public class HelmListener implements Listener {
 				String shipId = stand.getPersistentDataContainer().get(Constants.SHIP_HELM_ID_KEY, PersistentDataType.STRING);
 				Ship ship = shipById.get(shipId);
 				if( ship != null && ship.isPiloted()) {
-					SimpleShipsPlugin.log(0, player, "Helm must be dismounted before picking it up.");
+					LOG(0, player, "Helm must be dismounted before picking it up.");
 					return;
 				}
 				if( ship != null ) {

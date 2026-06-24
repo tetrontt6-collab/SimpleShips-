@@ -37,6 +37,8 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import static simpleships.SimpleShipsPlugin.LOG;
+
 /**
  * Provides a ship component to allow carrying of living
  * entities, (not players)
@@ -180,11 +182,11 @@ public class EntityPad {
 			return;
 		
 		if( !BlockSupport.isBlockAllowed(block.getType())) {
-			SimpleShipsPlugin.log(1, player, "Entity pad must be placed on an allowed block");
+			LOG(1, player, "Entity pad must be placed on an allowed block");
 			return;
 		}
 		if( BlockSupport.isLowerSlab(block)) {
-			SimpleShipsPlugin.log(1, player, "Entity pad can not be placed on a lower slab");
+			LOG(1, player, "Entity pad can not be placed on a lower slab");
 			return;
 		}
 
@@ -241,7 +243,7 @@ public class EntityPad {
 		}
 	}
 	private void attachEntity(LivingEntity entity) {
-		SimpleShipsPlugin.log(0,"Attached entity %s to pad %s", entity.getType().getName(), padId.toString());
+		LOG(0,"Attached entity %s to pad %s", entity.getType().getName(), padId.toString());
 		detachEntity();
 		post.addPassenger(entity);
 	}
@@ -268,7 +270,7 @@ public class EntityPad {
 		if( id == null ) {
 			return null;
 		}
-		SimpleShipsPlugin.log(0,"Found enitity pad interaction %s, looking for nest and post", id);
+		LOG(0,"Found enitity pad interaction %s, looking for nest and post", id);
 		
 		ArmorStand thePost = null;
 		BlockDisplay theNest = null;
@@ -300,18 +302,18 @@ public class EntityPad {
 		}
 
 		if( thePost == null ) {
-			SimpleShipsPlugin.log(1,"Failed to find post for entity pad %s", id);
+			LOG(1,"Failed to find post for entity pad %s", id);
 		} else {
-			SimpleShipsPlugin.log(1,"Removing orphaned post for entity pad %s", id);
+			LOG(1,"Removing orphaned post for entity pad %s", id);
 			thePost.remove();
 		}
 		if( theNest == null ) {
-			SimpleShipsPlugin.log(1, "Failed to find nest for entity pad %s", id);
+			LOG(1, "Failed to find nest for entity pad %s", id);
 		} else {
-			SimpleShipsPlugin.log(1,"Removing orphaned nest for entity pad %s", id);
+			LOG(1,"Removing orphaned nest for entity pad %s", id);
 			theNest.remove();
 		}
-		SimpleShipsPlugin.log(1, "Removing orphaned interaction for entity pad %s", id);
+		LOG(1, "Removing orphaned interaction for entity pad %s", id);
 		inter.remove();
 		
 		return null;

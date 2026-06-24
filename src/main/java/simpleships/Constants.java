@@ -25,6 +25,8 @@ public class Constants {
 
 	static public final NamespacedKey ITEM_TYPE_KEY = new NamespacedKey(NAME_SPACE,"item_type");
 	static public final NamespacedKey SHIP_COMPONENT_KEY = new NamespacedKey(NAME_SPACE,"simple_ships_component_key");
+
+	@Deprecated 
 	static public final String SHIP_COMPONENT_ITEM_TYPE = "simple_ships_component";
 	
 	static public final NamespacedKey SHIP_HELM_ID_KEY = new NamespacedKey(NAME_SPACE, "ship_helm_id_key");
@@ -53,9 +55,23 @@ public class Constants {
 	static public final NamespacedKey PASSENGER_SEAT_RECIPE_KEY = new NamespacedKey(NAME_SPACE, "passenger_seat_recipe");
 
 
+
+	///reworking to fit the new model
+	static public final NamespacedKey SIMPLE_SHIPS_COMPONENT = new NamespacedKey(NAME_SPACE, "simple_ships_component");
+	static public final NamespacedKey SS_CD_IS_ACTIVE_KEY = new NamespacedKey(NAME_SPACE, "simple_ships_cd_is_active_key");
+	static public final NamespacedKey SS_CD_ID_KEY        = new NamespacedKey(NAME_SPACE, "simple_ships_cd_id_key");
+	static public final NamespacedKey SS_CD_TYPE_KEY      = new NamespacedKey(NAME_SPACE, "simple_ships_cd_type_key");
+
+	
+
+
 	static final public boolean isShipComponent(Object obj) {
 		if( obj instanceof PersistentDataHolder pdh) {
 			PersistentDataContainer pdc = pdh.getPersistentDataContainer();
+			Boolean boolVal = pdc.get(Constants.SIMPLE_SHIPS_COMPONENT, PersistentDataType.BOOLEAN);
+			if( boolVal != null )
+				return boolVal;
+					
 			if( SHIP_COMPONENT_ITEM_TYPE.equals(pdc.get(Constants.SHIP_COMPONENT_KEY, PersistentDataType.STRING)))
 				return true;
 		}
@@ -66,6 +82,7 @@ public class Constants {
 		if( obj instanceof PersistentDataHolder pdh) {	
 			PersistentDataContainer pdc = pdh.getPersistentDataContainer();
 			pdc.set(Constants.SHIP_COMPONENT_KEY, PersistentDataType.STRING, Constants.SHIP_COMPONENT_ITEM_TYPE);
+			pdc.set(Constants.SIMPLE_SHIPS_COMPONENT, PersistentDataType.BOOLEAN, true);
 		}
 	}
 	

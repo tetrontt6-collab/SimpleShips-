@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0
+
+* Reworking PersistentData information used
+* Enhancing the recovery of components on chunk loads/player logins
+
+## 1.0.1
+
+* Cleaned up extraneous debug messages
+
 ## 1.0
 * Added permission checks to the available commands
 

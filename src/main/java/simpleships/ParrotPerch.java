@@ -38,6 +38,8 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import static simpleships.SimpleShipsPlugin.LOG;
+
 /**
  * Provides a ship component to allow carrying of living
  * entities, (not players)
@@ -77,7 +79,7 @@ public class ParrotPerch {
 	private void createParrotPerch() {
 		World world = perchLoc.getWorld();
 
-		SimpleShipsPlugin.log(0,"PerchLoc yaw: %f", perchLoc.getYaw());
+		LOG(0,"PerchLoc yaw: %f", perchLoc.getYaw());
 		Location anchorLoc = perchLoc.clone();
 		anchorLoc.setYaw(perchLoc.getYaw());
 		perchAnchor = world.spawn(anchorLoc.add(0,-V_OFFSET,0), ArmorStand.class, as -> {
@@ -208,11 +210,11 @@ public class ParrotPerch {
 			return;
 		
 		if( !BlockSupport.isBlockAllowed(block.getType())) {
-			SimpleShipsPlugin.log(1, player, "Parrot perch must be placed on an allowed block");
+			LOG(1, player, "Parrot perch must be placed on an allowed block");
 			return;
 		}
 		if( BlockSupport.isLowerSlab(block)) {
-			SimpleShipsPlugin.log(1, player, "Parrot perch can not be placed on a lower slab");
+			LOG(1, player, "Parrot perch can not be placed on a lower slab");
 			return;
 		}
 
@@ -222,7 +224,7 @@ public class ParrotPerch {
 
 		Location loc = block.getLocation().clone();
 		float reversePlayerYaw = UtilFuncs.getClosestFacingYawDegrees(player.getYaw());
-		SimpleShipsPlugin.log(0,"Placing perch, player yaw: %f, moved to %f", player.getYaw(), reversePlayerYaw);
+		LOG(0,"Placing perch, player yaw: %f, moved to %f", player.getYaw(), reversePlayerYaw);
 		loc.setYaw(reversePlayerYaw);
 		ParrotPerch perch = new ParrotPerch(loc);
 		EntityManager.addParrotPerch(perch);
@@ -256,7 +258,7 @@ public class ParrotPerch {
 	
 	static public void onPerchHit(Player player, ArmorStand stand, EntityDamageByEntityEvent event) {
 		String standId= stand.getPersistentDataContainer().get(Constants.PARROT_PERCH_ID_KEY, PersistentDataType.STRING);
-		SimpleShipsPlugin.log(0,"Perch hit");
+		LOG(0,"Perch hit");
 		if( standId == null )
 			return;
 		ParrotPerch perch = EntityManager.getParrotPerch(standId);
@@ -274,7 +276,7 @@ public class ParrotPerch {
 		}
 	}
 	private void attachParrot(LivingEntity entity) {
-		SimpleShipsPlugin.log(0,"Attached parrot %s to perch %s", entity.getType().getName(), perchId.toString());
+		LOG(0,"Attached parrot %s to perch %s", entity.getType().getName(), perchId.toString());
 		detachParrot();
 		perchAnchor.addPassenger(entity);
 	}
@@ -290,7 +292,7 @@ public class ParrotPerch {
 	}
 
 	void removeFromWorld() {
-		SimpleShipsPlugin.log(0,"Removing perch from world");
+		LOG(0,"Removing perch from world");
 		detachParrot();
 		perchPost.remove();
 		perchAnchor.remove();
@@ -331,7 +333,7 @@ public class ParrotPerch {
 		if( id == null)
 			return null;
 
-		SimpleShipsPlugin.log(0,"Found parrot perch armor stand %s, looking for post and crossbar", id);
+		LOG(0,"Found parrot perch armor stand %s, looking for post and crossbar", id);
 		BlockDisplay thePost = null;
 		BlockDisplay theCrossbar = null;
 
@@ -354,25 +356,25 @@ public class ParrotPerch {
 		}
 
 		if( thePost != null && theCrossbar != null) {
-			SimpleShipsPlugin.log(0,"Parrot perch %s being rehydrated", id);
+			LOG(0,"Parrot perch %s being rehydrated", id);
 			return new ParrotPerch(theStand, thePost, theCrossbar);
 		}
 
 		if( thePost == null ) {
-			SimpleShipsPlugin.log(1,"Failed to find the post for the parrot perch %s", id);
+			LOG(1,"Failed to find the post for the parrot perch %s", id);
 		} else {
-			SimpleShipsPlugin.log(1,"Removing orphaned post for parrot perch %s", id);
+			LOG(1,"Removing orphaned post for parrot perch %s", id);
 		}
 
 		//same for crossbar
 		if( theCrossbar == null ) {
-			SimpleShipsPlugin.log(1,"Failed to find the crossbar for the parrot perch %s", id);
+			LOG(1,"Failed to find the crossbar for the parrot perch %s", id);
 		} else {
-			SimpleShipsPlugin.log(1,"Removing orphaned crossbar for parrot perch %s", id);
+			LOG(1,"Removing orphaned crossbar for parrot perch %s", id);
 		}
 		
 		
-		SimpleShipsPlugin.log(1,"Removing orphaned armor stand for parrot perch %s", id);
+		LOG(1,"Removing orphaned armor stand for parrot perch %s", id);
 		theStand.remove();
 		return null;
 	}

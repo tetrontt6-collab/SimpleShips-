@@ -36,6 +36,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
+import static simpleships.SimpleShipsPlugin.LOG;
+
 /**
  * The EntityManager handles management of the ship components - seat, pad
  * except the helm which is managed directly by the {@link:Ship.class} and
@@ -59,7 +61,7 @@ public class EntityManager implements Listener {
 			
 		if( entity instanceof ArmorStand stand ) {
 			if( id == null ) {
-//				SimpleShipsPlugin.log(0,"Armor stand at (%f,%f,%f) is not a ship component", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
+//				LOG(0,"Armor stand at (%f,%f,%f) is not a ship component", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
 				return;
 			}
 			
@@ -70,20 +72,20 @@ public class EntityManager implements Listener {
 				if( seat != null ) {
 					passengerSeats.add(seat);
 				} else {
-					SimpleShipsPlugin.log(1,"Found orphaned passenger seat at (%f,%f,%f)", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
+					LOG(1,"Found orphaned passenger seat at (%f,%f,%f)", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
 				}
 			} else if(ParrotPerch.isParrotPerch(stand)) {
 				ParrotPerch perch = ParrotPerch.findParrotPerch(stand);
 				if( perch != null ) {
-					SimpleShipsPlugin.log(0, "Found parrot perch at (%f,%f,%f)", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
+					LOG(0, "Found parrot perch at (%f,%f,%f)", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
 					parrotPerchs.add(perch);
 				} else {
-					SimpleShipsPlugin.log(1,"Found orphaned parrot perch at (%f,%f,%f)", entity.getX(), entity.getY(), entity.getZ());
+					LOG(1,"Found orphaned parrot perch at (%f,%f,%f)", entity.getX(), entity.getY(), entity.getZ());
 				}
 			}
 		} else if( entity instanceof Interaction inter) {
 			if( id == null ) {
-				SimpleShipsPlugin.log(0,"Interaction at (%f,%f,%f) is not a ship component", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
+				LOG(0,"Interaction at (%f,%f,%f) is not a ship component", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
 				return;
 			}
 
@@ -92,7 +94,7 @@ public class EntityManager implements Listener {
 				if( pad != null ) {
 					entityPads.add(pad);
 				} else {
-					SimpleShipsPlugin.log(1,"Found orphaned entity pad at (%f,%f,%f)", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
+					LOG(1,"Found orphaned entity pad at (%f,%f,%f)", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
 				}
 			}
 		}
@@ -106,7 +108,7 @@ public class EntityManager implements Listener {
 	}
 	
 	public void rehydrateEntities() {
-		SimpleShipsPlugin.log(0,"Rehydrating");
+		LOG(0,"Rehydrating");
 		for(World world : Bukkit.getWorlds()) {
 			for( Interaction inter : world.getEntitiesByClass(Interaction.class)) {
 				checkForShipEntity(inter);

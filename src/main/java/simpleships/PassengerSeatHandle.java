@@ -10,6 +10,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.joml.Vector3f;
 
+import static simpleships.SimpleShipsPlugin.LOG;
+
 public class PassengerSeatHandle {
 	final PassengerSeat seat;
 	final Vector3f offset;
@@ -24,7 +26,7 @@ public class PassengerSeatHandle {
 			Location loc = rider.getRespawnLocation();
 			if( loc != null ) {
 				spawnLocation = loc.clone();
-				SimpleShipsPlugin.log(0,"Passenger %s respawns at (%d,%d,%d)", rider.getUniqueId().toString(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+				LOG(0,"Passenger %s respawns at (%d,%d,%d)", rider.getUniqueId().toString(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 			}
 		}
 	}

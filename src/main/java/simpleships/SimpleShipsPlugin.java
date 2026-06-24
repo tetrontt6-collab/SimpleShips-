@@ -62,14 +62,14 @@ public class SimpleShipsPlugin extends JavaPlugin {
 			}
 		}.runTaskTimer(this, 0, Constants.UPDATE_TICKS);
 		
-		log(0,"Simple Ships  plugin startup");
+		LOG(0,"Simple Ships  plugin startup");
 	}
 
 	@Override
 	public void onDisable() {
 		if( helmListener != null )
 			helmListener.onDisable();
-		log(0,"Simple Ships plugin shutdown");
+		LOG(0,"Simple Ships plugin shutdown");
 	}
 
 	@Override
@@ -192,7 +192,7 @@ public class SimpleShipsPlugin extends JavaPlugin {
 		}
 	}
 
-	static public void log(int level, String msg, Object... args) {
+	static public void LOG(int level, String msg, Object... args) {
 		try {
 			if( level == 0 ) {
 				if( configuration.debugOn)
@@ -205,7 +205,7 @@ public class SimpleShipsPlugin extends JavaPlugin {
 		}
 	}
 	
-	static public void log(int level, Player player, String msg, Object... args) {
+	static public void LOG(int level, Player player, String msg, Object... args) {
 		try {
 			String toSend = String.format(msg, args);
 			if( level == 0 ) {

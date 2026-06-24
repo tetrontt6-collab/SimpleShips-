@@ -1,4 +1,24 @@
-* Notes
+* PDC Details
+  - Every block display, entity display, armor stand and interaction will be tagged with a
+    common boolean tag:
+    
+    boolean: NamespacedKey(NAME_SPACE, "simple_ships_component") -> true
+
+  - Every ship block in a virtualized ship block will be tagged as being a ship
+    block and with the unique id of the ship itself, as pulled from the helm block
+
+    boolean: NamespacedKey(NAME_SPACE, "simple_ships_ship_block") -> true
+    string: NamespacedKey(NAME_SPACE, "simple_ships_ship_id")   -> helm.uniqueId
+    
+
+  - Every component and all entities that are part of the components will be
+    tagged with component type identifiers and a unique id for the component
+
+    string: NamespacedKey(NAME_SPACE, "simple_ships_component_type") -> ("simple_ships_helm","simple_ships_perch","simple_ships_seat","simple_ships_pad")
+    string: NamespacedKey(NAME_SPACE, "simple_ships_component_id")   -> UUID.toString()
+
+  - Introduce the CompositeDisplay into the code base to manage helm, perch, seat and pad    
+    
 ** Connecting Persistent Properties
    All ship components will have a property for the key
    Constants.ITEM_TYPE_KEY in the component's PersistentData settings.

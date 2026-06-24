@@ -35,6 +35,8 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import static simpleships.SimpleShipsPlugin.LOG;
+
 /**
  * A PassengerSeat allows for other players to ride on the ship.  The
  * seat is composed of an {@link:org.bukkit.entity.ArmorStand} that the player
@@ -155,11 +157,11 @@ public class PassengerSeat  {
 			return;
 		
 		if( !BlockSupport.isBlockAllowed(block.getType())) {
-			SimpleShipsPlugin.log(0, player, "Passenger seat must be placed on an allowed block");
+			LOG(0, player, "Passenger seat must be placed on an allowed block");
 			return;
 		}
 		if( BlockSupport.isLowerSlab(block)) {
-			SimpleShipsPlugin.log(0, player, "Passenger seat can not be placed on a lower slab");
+			LOG(0, player, "Passenger seat can not be placed on a lower slab");
 			return;
 		}
 
@@ -267,14 +269,14 @@ public class PassengerSeat  {
 			return null;
 		}
 
-		SimpleShipsPlugin.log(0,"Found passenger seat armor stand %s, looking for seat and cushion",id);
+		LOG(0,"Found passenger seat armor stand %s, looking for seat and cushion",id);
 		BlockDisplay theStair = null;
 		BlockDisplay theCushion = null;
 		
 		for(World world : Bukkit.getWorlds()) {
 			for(BlockDisplay bd : world.getEntitiesByClass(BlockDisplay.class)) {
 				String bdID = bd.getPersistentDataContainer().get(Constants.PASSENGER_SEAT_ID_KEY, PersistentDataType.STRING);
-//				SimpleShipsPlugin.log(0, "Found block %s, id %s", bd.getBlock().getMaterial(), bdID);
+//				LOG(0, "Found block %s, id %s", bd.getBlock().getMaterial(), bdID);
 				if(bdID != null && id.equals(bdID)) {
 					if(isPassengerSeat( bd)) {
 						theStair = bd;
@@ -290,25 +292,25 @@ public class PassengerSeat  {
 				break;
 		}
 		if( theStair != null && theCushion != null) {
-			SimpleShipsPlugin.log(0,"Passenger seat %s being rehydrated", id);
+			LOG(0,"Passenger seat %s being rehydrated", id);
 			return new PassengerSeat(thePost, theStair, theCushion);
 		}
 
 		if( theStair == null ) {
-			SimpleShipsPlugin.log(1, "Failed to find the stair for passenger seat %s", id);
+			LOG(1, "Failed to find the stair for passenger seat %s", id);
 		} else {
-			SimpleShipsPlugin.log(1, "Removing orphaned stair for passenger seat %s", id);
+			LOG(1, "Removing orphaned stair for passenger seat %s", id);
 			theStair.remove();
 		}
 		
 		if( theCushion == null ) {
-			SimpleShipsPlugin.log(1, "Failed to find the cushion for passenger seat %s", id);
+			LOG(1, "Failed to find the cushion for passenger seat %s", id);
 		} else {
-			SimpleShipsPlugin.log(1, "Removing orphaned cushion for passenger seat %s", id);
+			LOG(1, "Removing orphaned cushion for passenger seat %s", id);
 			theCushion.remove();
 		}
 
-		SimpleShipsPlugin.log(1, "Removing orphaned armor stand for passenger seat %s", id);
+		LOG(1, "Removing orphaned armor stand for passenger seat %s", id);
 		thePost.remove();
 		return null;
 	}

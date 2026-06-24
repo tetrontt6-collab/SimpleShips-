@@ -61,6 +61,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import static simpleships.SimpleShipsPlugin.LOG;
+
 /**
  * The Ship handles all of the details around assembly,
  * creation of the display entities and movement.  The
@@ -104,7 +106,7 @@ public class Ship {
 
 	public Ship(BlockFace facing, Location blockLocation) {
 		this.uniqueId = UUID.randomUUID();
-		SimpleShipsPlugin.log(0, "creating ship %s at (%f,%f,%f) => (%d,%d,%d)", uniqueId.toString(),
+		LOG(0, "creating ship %s at (%f,%f,%f) => (%d,%d,%d)", uniqueId.toString(),
 													blockLocation.getX(), blockLocation.getY(), blockLocation.getZ(),
 													blockLocation.getBlockX(),blockLocation.getBlockY(),blockLocation.getBlockZ());
 		this.shipYaw = UtilFuncs.wrapDegrees(UtilFuncs.getDegreesFromFace(facing));
@@ -146,7 +148,7 @@ public class Ship {
 	}
 
 	public void forceUnmount() {
-		SimpleShipsPlugin.log(0,"Force unmount called for %s", getUniqueIdStr());
+		LOG(0,"Force unmount called for %s", getUniqueIdStr());
 		align();
 		disassemble();
 		pilot = null;
@@ -159,7 +161,7 @@ public class Ship {
 			return;
 		
 		if( player.equals(pilot) ) {
-			SimpleShipsPlugin.log(0,"Unmounted player from %s", getUniqueIdStr());
+			LOG(0,"Unmounted player from %s", getUniqueIdStr());
 			align();
 			disassemble();
 			pilot= null;
@@ -168,14 +170,14 @@ public class Ship {
 
 	public void mount(Player player) {
 		if( pilot != null ) {
-			SimpleShipsPlugin.log(0,player,"A player is already manning this vessel: %s", getUniqueIdStr());
+			LOG(0,player,"A player is already manning this vessel: %s", getUniqueIdStr());
 			return;
 		}
 		helmAnchor.addPassenger(player);
 		pilot = player;
 		assemble();
 		if(canAssemble)
-			SimpleShipsPlugin.log(0,player, "Mounted player on %s", getUniqueIdStr());
+			LOG(0,player, "Mounted player on %s", getUniqueIdStr());
 	}
 
 	public boolean isPlayerPilot(Player player) {
@@ -357,27 +359,27 @@ public class Ship {
 
 		Configuration cfg = SimpleShipsPlugin.configuration;
 		if( cfg.maxBlocks != -1 && shipBlocks.size() > cfg.maxBlocks) {
-			SimpleShipsPlugin.log(1,pilot,"Number of blocks %d exceeds max blocks allowed %d", shipBlocks.size(), cfg.maxBlocks);
+			LOG(1,pilot,"Number of blocks %d exceeds max blocks allowed %d", shipBlocks.size(), cfg.maxBlocks);
 			canAssemble = false;
 		}
 
 		if( cfg.maxXWidth != -1 && shipBounds.getWidthX() > cfg.maxXWidth ) {
-			SimpleShipsPlugin.log(1,pilot,"X width %d of the ship exceeds max allowed %d", (int)shipBounds.getWidthX(), cfg.maxXWidth);
+			LOG(1,pilot,"X width %d of the ship exceeds max allowed %d", (int)shipBounds.getWidthX(), cfg.maxXWidth);
 			canAssemble = false;
 		}
 
 		if( cfg.maxZWidth != -1 && shipBounds.getWidthZ() > cfg.maxZWidth ) {
-			SimpleShipsPlugin.log(1,pilot,"Z width %d of the ship exceeds max allowed %d", (int)shipBounds.getWidthZ(), cfg.maxZWidth);
+			LOG(1,pilot,"Z width %d of the ship exceeds max allowed %d", (int)shipBounds.getWidthZ(), cfg.maxZWidth);
 			canAssemble = false;
 		}
 
 		if( cfg.maxHeight != -1 && shipBounds.getHeight() > cfg.maxHeight ) {
-			SimpleShipsPlugin.log(1,pilot,"Height %d of the ship exceeds max allowed %d", (int)shipBounds.getHeight(), cfg.maxHeight);
+			LOG(1,pilot,"Height %d of the ship exceeds max allowed %d", (int)shipBounds.getHeight(), cfg.maxHeight);
 			canAssemble = false;
 		}
 
 		if(!touchingWater ) {
-			SimpleShipsPlugin.log(1,pilot,"Ships must have a connection to water");
+			LOG(1,pilot,"Ships must have a connection to water");
 			canAssemble = false;
 		}
 		
@@ -411,7 +413,7 @@ public class Ship {
 		}
 													 
 		
-		SimpleShipsPlugin.log(0,"Found %d item frames, %d armor stands, %d interactions, %d entities", itemFrames.size(), armorStands.size(), interactions.size(), otherDisplayEntities.size());
+		LOG(0,"Found %d item frames, %d armor stands, %d interactions, %d entities", itemFrames.size(), armorStands.size(), interactions.size(), otherDisplayEntities.size());
 		createItemFrameDisplays();
 		
 		for(Location remove : toRemove) {
@@ -427,7 +429,7 @@ public class Ship {
 		}
 
 		pilot.sendMessage("Ship assembled with " + shipBlocks.size() + " blocks");
-		SimpleShipsPlugin.log(0, pilot, "Ship assembled with %d blocks bounds (%f,%f,%f) => (%f,%f,%f)   (%f,%f,%f)",
+		LOG(0, pilot, "Ship assembled with %d blocks bounds (%f,%f,%f) => (%f,%f,%f)   (%f,%f,%f)",
 													shipBlocks.size(),
 													shipBounds.getMinX(), shipBounds.getMinY(), shipBounds.getMinZ(),
 													shipBounds.getMaxX(), shipBounds.getMaxY(), shipBounds.getMaxZ(),
@@ -501,7 +503,7 @@ public class Ship {
 			//in the spot of the players death, if there is a container here
 			//we will assume that is the situation and will not restore the block.
 			if( UtilFuncs.isZeroOffset(mb.offset())) {
-				SimpleShipsPlugin.log(0,"The root block is found: (%f,%f,%f) %s", bl.getX(), bl.getY(), bl.getZ(), block.getType().toString());
+				LOG(0,"The root block is found: (%f,%f,%f) %s", bl.getX(), bl.getY(), bl.getZ(), block.getType().toString());
 				if(UtilFuncs.isContainer(block) )
 					continue;
 			}
@@ -688,7 +690,7 @@ public class Ship {
 			return false;
 		}
 		if( Material.ITEM_FRAME.equals(type)) {
-			SimpleShipsPlugin.log(0,"Found an item frame");
+			LOG(0,"Found an item frame");
 		}
 
 		ItemStack[] inventoryContents = null;
@@ -696,12 +698,12 @@ public class Ship {
 
 		if( block.getState() instanceof InventoryHolder inventory) {
 			inventoryContents = BlockSupport.cloneContents(inventory.getInventory().getContents());
-			SimpleShipsPlugin.log(0,"Found and inventory holder : %s", type);
+			LOG(0,"Found and inventory holder : %s", type);
 		}
 
 		
 		if( displayData instanceof Chest chest ) {
-			SimpleShipsPlugin.log(0,"Found a chest");
+			LOG(0,"Found a chest");
 			if( chest.getType() == Chest.Type.SINGLE ) {
 				addDoubleBlockDisplay(world, block, displayData, startLoc, offset, 1.0f, inventoryContents);
 			}
@@ -744,7 +746,7 @@ public class Ship {
 
 
 		if( block.getState() instanceof Shelf ) {
-		 	SimpleShipsPlugin.log(0,"Found a shelf");
+		 	LOG(0,"Found a shelf");
 			addShelfDisplay(world, block, displayData, startLoc, offset, inventoryContents, orient);
 			return true;
 		}
@@ -1118,7 +1120,7 @@ public class Ship {
 					Vector3f translation = new Vector3f(offset.x - (itemOffset.x *  (14 * Constants.ONE_64)) + (itemOffset.z * (slot * (20 * Constants.ONE_64))),
 																				offset.y - SHIP_VERTICAL_OFFSET + 0.5f,
 																				offset.z - (itemOffset.z * (14 * Constants.ONE_64)) - (itemOffset.x * (slot * (20 * Constants.ONE_64))));
-					SimpleShipsPlugin.log(0,"Adding item %s to slot %d translation (%f,%f,%f)  off(%f,%f,%f)",
+					LOG(0,"Adding item %s to slot %d translation (%f,%f,%f)  off(%f,%f,%f)",
 																item.getType(),
 																slot,
 																translation.x, translation.y, translation.z,
@@ -1259,7 +1261,7 @@ public class Ship {
 				as.setGravity(false);
 				as.setPersistent(true);
 			});
-		SimpleShipsPlugin.log(0,"Marking helm anchor");
+		LOG(0,"Marking helm anchor");
 		Constants.markShipComponent(helmAnchor);
 
 	}
@@ -1360,7 +1362,7 @@ public class Ship {
 		return stand.getUniqueId().equals(helmAnchor.getUniqueId());
 	}
 	private void captureEntityPad(Location standLoc, ArmorStand stand) {
-		SimpleShipsPlugin.log(0,"Found enitity pad at (%f,%f,%f)", standLoc.getX(), standLoc.getY(), standLoc.getZ());
+		LOG(0,"Found enitity pad at (%f,%f,%f)", standLoc.getX(), standLoc.getY(), standLoc.getZ());
 		EntityPad pad = EntityManager.getEntityPad(stand.getPersistentDataContainer().get(Constants.ENTITY_PAD_ID_KEY, PersistentDataType.STRING));
 		if( pad != null ) {
 			Vector3f worldOffset = new Vector3f((float)-(standLoc.getX() - helmAnchor.getX()),
@@ -1373,14 +1375,14 @@ public class Ship {
 		}
 	}
 	private void captureParrotPerch(Location standLoc, ArmorStand stand) {
-		SimpleShipsPlugin.log(0,"Found enitity perch at (%f,%f,%f)", standLoc.getX(), standLoc.getY(), standLoc.getZ());
+		LOG(0,"Found enitity perch at (%f,%f,%f)", standLoc.getX(), standLoc.getY(), standLoc.getZ());
 		ParrotPerch perch = EntityManager.getParrotPerch(stand.getPersistentDataContainer().get(Constants.PARROT_PERCH_ID_KEY, PersistentDataType.STRING));
 		if( perch != null ) {
 			parrotPerchs.add(new ParrotPerchHandle(perch, helmAnchor.getLocation(), shipYawAtAssemble));
 		}
 	}
 	private void capturePassengerSeat(Location standLoc, ArmorStand stand) {
-		SimpleShipsPlugin.log(0,"Found passenger seat at (%f,%f,%f)", standLoc.getX(), standLoc.getY(), standLoc.getZ());
+		LOG(0,"Found passenger seat at (%f,%f,%f)", standLoc.getX(), standLoc.getY(), standLoc.getZ());
 		PassengerSeat pseat = EntityManager.getPassengerSeat(stand.getPersistentDataContainer().get(Constants.PASSENGER_SEAT_ID_KEY, PersistentDataType.STRING));
 		if( pseat != null ) {
 			Vector3f worldOffset = new Vector3f((float)-(standLoc.getX() - helmAnchor.getX()),
@@ -1416,26 +1418,26 @@ public class Ship {
 																		 (float)(eloc.getZ() - anchor.getZ()));
 
 			if( entity instanceof ArmorStand stand) {
-				SimpleShipsPlugin.log(0,"Entity is an armor stand");
+				LOG(0,"Entity is an armor stand");
 				if(isHelmStand(stand) ) {
-					SimpleShipsPlugin.log(0,"Helm Stand");
+					LOG(0,"Helm Stand");
 					continue;
 				}
 				if(EntityPad.isEntityPadPost(stand)) {
-					SimpleShipsPlugin.log(0,"Entity pad");
+					LOG(0,"Entity pad");
 					captureEntityPad(eloc,stand);
 					continue;
 				}
 				if(ParrotPerch.isParrotPerch(stand)) {
-					SimpleShipsPlugin.log(0,"Parrot perch");
+					LOG(0,"Parrot perch");
 					captureParrotPerch(eloc, stand);
 				}
 				if(PassengerSeat.isPassengerSeat(stand)) {
-					SimpleShipsPlugin.log(0,"Passenger Seat");
+					LOG(0,"Passenger Seat");
 					capturePassengerSeat(eloc, stand);
 					continue;
 				}
-				SimpleShipsPlugin.log(0,"ArmorStand at(%f,%f,%f) is not a ship compoment, capturing", eloc.getX(), eloc.getY(), eloc.getZ());
+				LOG(0,"ArmorStand at(%f,%f,%f) is not a ship compoment, capturing", eloc.getX(), eloc.getY(), eloc.getZ());
 				armorStands.add(new ArmorStandHandle(stand, anchor, shipYawAtAssemble));
 			}
 			if(Constants.isShipComponent(entity)) {
@@ -1464,7 +1466,7 @@ public class Ship {
 				}
 				interactions.add(new InteractionHandle(interaction, anchor, shipYawAtAssemble));
 			} else {
-				SimpleShipsPlugin.log(0,"Entity is un-supported: %s %s", entity.getType().name(), entity.getName());
+				LOG(0,"Entity is un-supported: %s %s", entity.getType().name(), entity.getName());
 			}
 		}
 	}
@@ -1476,10 +1478,10 @@ public class Ship {
 	}
 
 	private void checkPlayerRespawn(Location anchor, Player player, HashSet<Vector3i> blocksInShip) {
-		SimpleShipsPlugin.log(0,"Checking for respawn for %s", player.getUniqueId().toString());
+		LOG(0,"Checking for respawn for %s", player.getUniqueId().toString());
 		Location loc = player.getRespawnLocation();
 		if( loc == null ) {
-			SimpleShipsPlugin.log(0,"No respawn point set for player");
+			LOG(0,"No respawn point set for player");
 			return;
 		}
 
@@ -1503,13 +1505,13 @@ public class Ship {
 
 		if(isOnShip ) {
 			blockLoc.set(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-			SimpleShipsPlugin.log(0,"Respawn (%d,%d,%d) for %s found in ship", blockLoc.x, blockLoc.y, blockLoc.z, player.getUniqueId().toString());
+			LOG(0,"Respawn (%d,%d,%d) for %s found in ship", blockLoc.x, blockLoc.y, blockLoc.z, player.getUniqueId().toString());
 			Vector3f offset = new Vector3f(loc.getBlockX() - anchor.getBlockX(),
 																		 loc.getBlockY() - anchor.getBlockY(),
 																		 loc.getBlockZ() - anchor.getBlockZ());
 			respawns.add(new RespawnHandle(player, offset));
 		} else {
-			SimpleShipsPlugin.log(0,"Respawn point not on ship");
+			LOG(0,"Respawn point not on ship");
 		}
 	}
 
