@@ -162,7 +162,9 @@ public class HelmListener implements Listener {
 				if( ship != null ) {
 					ship.removeHelm();
 					shipById.remove(shipId);
-					SimpleShipsPlugin.giveHelmToPlayer(player);
+					if( player.getGameMode() != GameMode.CREATIVE) {
+						SimpleShipsPlugin.giveHelmToPlayer(player);
+					}
 				} else {
 					removeLooseHelm(stand, shipId);
 				}

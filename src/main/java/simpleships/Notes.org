@@ -1,3 +1,4 @@
+  
 * PDC Details
   - Every block display, entity display, armor stand and interaction will be tagged with a
     common boolean tag:
@@ -17,9 +18,16 @@
     string: NamespacedKey(NAME_SPACE, "simple_ships_component_type") -> ("simple_ships_helm","simple_ships_perch","simple_ships_seat","simple_ships_pad")
     string: NamespacedKey(NAME_SPACE, "simple_ships_component_id")   -> UUID.toString()
 
-  - Introduce the CompositeDisplay into the code base to manage helm, perch, seat and pad    
+  - Introduced the CompositeDisplay into the code base to manage helm, perch, seat and pad    
+
+** Interactions
+   Using the Interaction as the base of the CompositeDisplay revealed an interesting situation
+   in that the location of an Interaction always resets the yaw (and probably pitch) to 0.  That
+   affected the reconstituting of CompositeDisplays using the Interaction as the root.  So now all
+   Interactions in the CompositeDisplay carry the yaw and pitch values of their intended location in
+   persistent data details.
     
-** Connecting Persistent Properties
+** Connecting Persistent Properties 
    All ship components will have a property for the key
    Constants.ITEM_TYPE_KEY in the component's PersistentData settings.
    

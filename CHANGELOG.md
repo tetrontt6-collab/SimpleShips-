@@ -3,7 +3,7 @@
 ## 1.1.0
 
 * Reworking PersistentData information used
-* Enhancing the recovery of components on chunk loads/player logins
+* Reworked ship components to utilize a new CompositeDisplay manager which eliminates needs to rehydrate and should work consistently now after login/logout and server restarts
 
 ## 1.0.1
 

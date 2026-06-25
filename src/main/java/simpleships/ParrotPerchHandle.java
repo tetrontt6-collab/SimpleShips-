@@ -24,8 +24,8 @@ public class ParrotPerchHandle {
 	public ParrotPerchHandle(ParrotPerch perch, Location anchor, float shipYawAtAssemble) {
 		this.perch = perch;
 		this.shipYawAtAssemble = shipYawAtAssemble;
-		startingLoc = perch.getPerchStandLocation().clone();
-		Location standLoc = perch.getPerchStandLocation();
+		startingLoc = perch.getLocation().clone();
+		Location standLoc = perch.getLocation();
 		int sx = standLoc.getBlockX();
 		int sy = standLoc.getBlockY();
 		int sz = standLoc.getBlockZ();
@@ -42,7 +42,7 @@ public class ParrotPerchHandle {
 		this.localOffset = new Vector3f(worldOffset);
 		inverseShipRotation.transform(this.localOffset);
 			
-		this.localYaw = UtilFuncs.wrapDegrees(perch.getPerchStandLocation().getYaw() - shipYawAtAssemble);
+		this.localYaw = UtilFuncs.wrapDegrees(perch.getLocation().getYaw() - shipYawAtAssemble);
 	}
 	
 	public void move(Location anchor, float yaw) {

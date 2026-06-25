@@ -58,9 +58,12 @@ public class Constants {
 
 	///reworking to fit the new model
 	static public final NamespacedKey SIMPLE_SHIPS_COMPONENT = new NamespacedKey(NAME_SPACE, "simple_ships_component");
-	static public final NamespacedKey SS_CD_IS_ACTIVE_KEY = new NamespacedKey(NAME_SPACE, "simple_ships_cd_is_active_key");
-	static public final NamespacedKey SS_CD_ID_KEY        = new NamespacedKey(NAME_SPACE, "simple_ships_cd_id_key");
-	static public final NamespacedKey SS_CD_TYPE_KEY      = new NamespacedKey(NAME_SPACE, "simple_ships_cd_type_key");
+	static public final NamespacedKey SS_CD_IS_ACTIVE_KEY  = new NamespacedKey(NAME_SPACE, "simple_ships_cd_is_active_key");
+	static public final NamespacedKey SS_CD_ID_KEY         = new NamespacedKey(NAME_SPACE, "simple_ships_cd_id_key");
+	static public final NamespacedKey SS_CD_TYPE_KEY       = new NamespacedKey(NAME_SPACE, "simple_ships_cd_type_key");
+	static public final NamespacedKey SS_CD_INTERACTION_ID = new NamespacedKey(NAME_SPACE, "simple_ships_cd_interaction_id");
+	static public final NamespacedKey SS_CD_YAW_VALUE      = new NamespacedKey(NAME_SPACE, "simple_ships_cd_yaw_value");
+	static public final NamespacedKey SS_CD_PITCH_VALUE    = new NamespacedKey(NAME_SPACE, "simple_ships_cd_pitch_value");
 
 	
 

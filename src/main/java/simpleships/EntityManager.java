@@ -44,9 +44,6 @@ import static simpleships.SimpleShipsPlugin.LOG;
  * {@link:HelmListener.class}.
  */
 public class EntityManager implements Listener {
-	static Set<EntityPad> entityPads = new HashSet<>();
-	static Set<ParrotPerch> parrotPerchs = new HashSet<>();
-	static Set<PassengerSeat> passengerSeats = new HashSet<>();
 	final SimpleShipsPlugin plugin;
 	final HelmListener helmListener;
 	
@@ -60,42 +57,8 @@ public class EntityManager implements Listener {
 		Location entityLocation = entity.getLocation();
 			
 		if( entity instanceof ArmorStand stand ) {
-			if( id == null ) {
-//				LOG(0,"Armor stand at (%f,%f,%f) is not a ship component", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
-				return;
-			}
-			
 			if(HelmSeat.isHelmSeat(stand)) {
 				helmListener.onChunkLoad(stand);
-			} else if(PassengerSeat.isPassengerSeat(stand)) {
-				PassengerSeat seat = PassengerSeat.findSeat(stand);
-				if( seat != null ) {
-					passengerSeats.add(seat);
-				} else {
-					LOG(1,"Found orphaned passenger seat at (%f,%f,%f)", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
-				}
-			} else if(ParrotPerch.isParrotPerch(stand)) {
-				ParrotPerch perch = ParrotPerch.findParrotPerch(stand);
-				if( perch != null ) {
-					LOG(0, "Found parrot perch at (%f,%f,%f)", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
-					parrotPerchs.add(perch);
-				} else {
-					LOG(1,"Found orphaned parrot perch at (%f,%f,%f)", entity.getX(), entity.getY(), entity.getZ());
-				}
-			}
-		} else if( entity instanceof Interaction inter) {
-			if( id == null ) {
-				LOG(0,"Interaction at (%f,%f,%f) is not a ship component", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
-				return;
-			}
-
-			if(EntityPad.isEntityPadInteraction(inter)) {
-				EntityPad pad = EntityPad.findPad(inter);
-				if( pad != null ) {
-					entityPads.add(pad);
-				} else {
-					LOG(1,"Found orphaned entity pad at (%f,%f,%f)", entityLocation.getX(), entityLocation.getY(), entityLocation.getZ());
-				}
 			}
 		}
 	}
@@ -108,7 +71,6 @@ public class EntityManager implements Listener {
 	}
 	
 	public void rehydrateEntities() {
-		LOG(0,"Rehydrating");
 		for(World world : Bukkit.getWorlds()) {
 			for( Interaction inter : world.getEntitiesByClass(Interaction.class)) {
 				checkForShipEntity(inter);
@@ -163,142 +125,8 @@ public class EntityManager implements Listener {
 		return best;
 	}
 
-	//==============Entity Pads==================//
-	static public void addEntityPad(EntityPad pad) {
-		entityPads.add(pad);
-	}
-	static EntityPad getEntityPad(UUID uuid) {
-		if( uuid != null)
-			return getEntityPad(uuid.toString());
-		return null;
-	}
-	static EntityPad getEntityPad(String id) {
-		if(id == null)
-			return null;
-		for(EntityPad pad : entityPads) {
-			if( id.equals(pad.getPadIdStr())) {
-				return pad;
-			}
-		}
-		return null;
-	}
-	static public void removeEntityPad(EntityPad pad) {
-		if( pad != null )
-			entityPads.remove(pad);
-	}
+
 	
-	static public void removeEntityPad(String id) {
-		if(id == null )
-			return;
-		EntityPad toRemove = getEntityPad(id);
-		if( toRemove != null ) {
-			toRemove.removeFromWorld();
-			entityPads.remove(toRemove);
-		}
-	}
-
-	//==============Parrot Perchs==================//
-	static public void addParrotPerch(ParrotPerch perch) {
-		parrotPerchs.add(perch);
-	}
-	static ParrotPerch getParrotPerch(UUID uuid) {
-		if( uuid != null)
-			return getParrotPerch(uuid.toString());
-		return null;
-	}
-	static ParrotPerch getParrotPerch(String id) {
-		if(id == null)
-			return null;
-		for(ParrotPerch perch : parrotPerchs) {
-			if( id.equals(perch.getPerchIdStr())) {
-				return perch;
-			}
-		}
-		return null;
-	}
-	static public void removeParrotPerch(ParrotPerch perch) {
-		if( perch != null )
-			parrotPerchs.remove(perch);
-	}
-	
-	static public void removeParrotPerch(String id) {
-		if(id == null )
-			return;
-		ParrotPerch toRemove = getParrotPerch(id);
-		if( toRemove != null ) {
-			toRemove.removeFromWorld();
-			parrotPerchs.remove(toRemove);
-		}
-	}
-	
-	//==============PassengerSeats Pads==================//
-	static public void addPassengerSeat(PassengerSeat pad) {
-		passengerSeats.add(pad);
-	}
-	static PassengerSeat getPassengerSeat(UUID uuid) {
-		if( uuid != null)
-			return getPassengerSeat(uuid.toString());
-		return null;
-	}
-	static PassengerSeat getPassengerSeat(String id) {
-		if(id == null)
-			return null;
-		for(PassengerSeat seat : passengerSeats) {
-			if( id.equals(seat.getSeatIdStr())) {
-				return seat;
-			}
-		}
-		return null;
-	}
-	static public void removePassengerSeat(PassengerSeat pad) {
-		if( pad != null )
-			passengerSeats.remove(pad);
-	}
-	
-	static public void removePassengerSeat(String id) {
-		if(id == null )
-			return;
-		PassengerSeat toRemove = getPassengerSeat(id);
-		if( toRemove != null ) {
-			toRemove.removeFromWorld();
-			passengerSeats.remove(toRemove);
-		}
-	}
-
-	/*
-	 * For detaching large entities from the Entity Pad, the Interaction
-	 * can be blocked (like say a horse), so this provides an alternate path
-	 * to detaching them.
-	 */
-	@EventHandler
-	public void onMountedEntityClicked(PlayerInteractAtEntityEvent event) {
-		if(!(event.getRightClicked() instanceof LivingEntity living)) {
-			return;
-		}
-
-		if(living instanceof ArmorStand) {
-			return;
-		}
-
-		Player player = event.getPlayer();
-		if(!player.isSneaking()) {
-			return;
-		}
-
-		if(!(living.getVehicle() instanceof ArmorStand stand)) {
-			return;
-		}
-
-		if(!EntityPad.isEntityPadPost(stand)) {
-			return;
-		}
-
-		EntityPad pad = getEntityPad(stand.getPersistentDataContainer().get(Constants.ENTITY_PAD_ID_KEY, PersistentDataType.STRING));
-		if( pad != null ) {
-			pad.detachEntity();
-			player.sendMessage("Entity detached");
-		}
-	}
 	/*
 	 * This method handles the player interacting with a placed
 	 * control entity
@@ -309,20 +137,6 @@ public class EntityManager implements Listener {
 			if( HelmSeat.isHelmSeat(stand)) {
 				event.setCancelled(true);
 				HelmListener.onEntityClicked(event.getPlayer(), stand, event);
-				return;
-			} else if(PassengerSeat.isPassengerSeat(stand)) {
-				event.setCancelled(true);
-				PassengerSeat.onStandClicked(event.getPlayer(), stand, event);
-			} else if(ParrotPerch.isParrotPerch(stand)) {
-				event.setCancelled(true);
-				ParrotPerch.onStandClicked(event.getPlayer(), stand, event);
-			}
-		}
-
-		if(event.getRightClicked() instanceof Interaction interaction ) {
-			if(EntityPad.isEntityPadInteraction(interaction)) {
-				event.setCancelled(true);
-				EntityPad.onInteractionClicked(event.getPlayer(), interaction, event);
 				return;
 			}
 		}
@@ -340,18 +154,6 @@ public class EntityManager implements Listener {
 			if(target instanceof ArmorStand stand ) {
 				if( HelmSeat.isHelmSeat(stand) ) {
 					HelmListener.onEntityHit(player, stand, event);
-					event.setCancelled(true);
-				} else if(PassengerSeat.isPassengerSeat(stand)) {
-					PassengerSeat.onEntityHit(player, stand, event);
-					event.setCancelled(true);
-				} else if(ParrotPerch.isParrotPerch(stand)) {
-					ParrotPerch.onPerchHit(player, stand, event);
-					event.setCancelled(true);
-				}
-			}
-			if( target instanceof Interaction inter) {
-				if( EntityPad.isEntityPadInteraction(inter) ) {
-					EntityPad.onEntityHit(player, inter, event);
 					event.setCancelled(true);
 				}
 			}
@@ -378,39 +180,26 @@ public class EntityManager implements Listener {
 		if(HelmSeat.isHelmSeat(type) ) {
 			event.setCancelled(true);
 			HelmListener.onPlayerPlaceEntity(event, item);
-		} else if( EntityPad.isEntityPad(type))  {
-			event.setCancelled(true);
-			EntityPad.onPlayerPlaceEntity(event, item);
-		} else if( PassengerSeat.isPassengerSeat(type) ) {
-			event.setCancelled(true);
-			PassengerSeat.onPlayerPlaceEntity(event, item);
-		} else if(ParrotPerch.isParrotPerch(type)) {
-			event.setCancelled(true);
-			ParrotPerch.onPlayerPlacePerch(event, item);
 		}
 	}
 
 
-	public void flushAll() {
-		for(EntityPad pad : entityPads ) {
-			pad.removeFromWorld();
+	public void flushAll(World world) {
+		for(Entity entity : world.getEntities()) {
+			if( Constants.SHIP_COMPONENT_ITEM_TYPE.equals(entity.getPersistentDataContainer().get(Constants.SHIP_COMPONENT_KEY, PersistentDataType.STRING))) {
+				entity.remove();
+			}	else {
+				Boolean bool = entity.getPersistentDataContainer().get(Constants.SIMPLE_SHIPS_COMPONENT, PersistentDataType.BOOLEAN);
+				if( bool != null && bool )
+					entity.remove();
+			}
 		}
-		entityPads.clear();
-		
-		for(PassengerSeat seat : passengerSeats ) {
-			seat.removeFromWorld();
-		}
-		passengerSeats.clear();
 
-		for(ParrotPerch perch : parrotPerchs) {
-			perch.removeFromWorld();
-		}
-		parrotPerchs.clear();
 	}
 
 	/**
 	 * This will search for all Display, ArmorStand and Interactions
-	 * that are tagged as a ship component and remove it from the world.
+	 * that are tagged as a ship component and remove it from all worlds.
 	 *
 	 * Useful for clearing components without doing bulk kills on other
 	 * entities.

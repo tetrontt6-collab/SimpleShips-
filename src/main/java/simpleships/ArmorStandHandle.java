@@ -22,6 +22,7 @@ public class ArmorStandHandle {
 	Vector3i blockOffset;
 	Vector3f intraBlockOffset;
 	float shipYawAtAssemble;
+	
 
 	public ArmorStandHandle(ArmorStand stand, Location anchor, float shipYawAtAssemble) {
 		this.stand = stand;

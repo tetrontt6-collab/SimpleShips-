@@ -8,6 +8,7 @@ package simpleships;
  */
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -38,6 +39,9 @@ public class SimpleShipsPlugin extends JavaPlugin {
 	public static Configuration configuration;
 	private HelmListener helmListener;
 	private EntityManager entityManager;
+	private EntityPadManager entityPadManager;
+	private PassengerSeatManager passengerSeatManager;
+	private ParrotPerchManager parrotPerchManager;
 	
 
 	@Override
@@ -50,6 +54,16 @@ public class SimpleShipsPlugin extends JavaPlugin {
 		registerRecipes();
 		helmListener = new HelmListener(this);
 		entityManager = new EntityManager(this, helmListener);
+
+		entityPadManager = new EntityPadManager(this);
+		getServer().getPluginManager().registerEvents(entityPadManager, this);
+
+		passengerSeatManager = new PassengerSeatManager(this);
+		getServer().getPluginManager().registerEvents(passengerSeatManager, this);
+
+		parrotPerchManager = new ParrotPerchManager(this);
+		getServer().getPluginManager().registerEvents(parrotPerchManager, this);
+		
 		getServer().getPluginManager().registerEvents(helmListener, this);
 		getServer().getPluginManager().registerEvents(entityManager, this);
 		helmListener.rehydrateHelms();
@@ -83,7 +97,7 @@ public class SimpleShipsPlugin extends JavaPlugin {
 
 		if(commandName.equalsIgnoreCase("cleanup")) {
 			helmListener.flushAll();
-			entityManager.flushAll();
+			entityManager.flushAll(player.getWorld());
 			entityManager.removeAllComponents();
 		}
 
@@ -93,19 +107,19 @@ public class SimpleShipsPlugin extends JavaPlugin {
 
 		if( commandName.equalsIgnoreCase("flush") ) {
 			helmListener.flushAll();
-			entityManager.flushAll();
+			entityManager.flushAll(player.getWorld());
 		}
 	
 		if( commandName.equalsIgnoreCase("pad") ) {
-			EntityPad.givePadToPlayer(player);
+			EntityPadManager.givePadToPlayer(player);
 		}
 
 		if( commandName.equalsIgnoreCase("seat")) {
-			PassengerSeat.giveSeatToPlayer(player);
+			PassengerSeatManager.giveSeatToPlayer(player);
 		}
 	
 		if( commandName.equalsIgnoreCase("perch")) {
-			ParrotPerch.givePerchToPlayer(player);
+			ParrotPerchManager.givePerchToPlayer(player);
 		}
 	
 		return true;
@@ -151,7 +165,7 @@ public class SimpleShipsPlugin extends JavaPlugin {
 			Bukkit.addRecipe(helmRecipe);
 		}
 
-		ItemStack entityPad = EntityPad.createEntityPadItemStack();
+		ItemStack entityPad = EntityPadManager.createEntityPadItemStack();
 		if( entityPad == null ) {
 			logger.severe("Failed to create the entity pad recipe");
 		} else {
@@ -165,7 +179,7 @@ public class SimpleShipsPlugin extends JavaPlugin {
 			Bukkit.addRecipe(entityPadRecipe);
 		}
 		
-		ItemStack passengerSeat = PassengerSeat.createPassengerSeatItemStack();
+		ItemStack passengerSeat = PassengerSeatManager.createPassengerSeatItemStack();
 		if( passengerSeat == null ) {
 			logger.severe("Failed to create the passenger seat recipe");
 		} else {
@@ -179,7 +193,7 @@ public class SimpleShipsPlugin extends JavaPlugin {
 			Bukkit.addRecipe(passengerSeatRecipe);
 		}
 
-		ItemStack parrotPerch = ParrotPerch.createParrotPerchItemStack();
+		ItemStack parrotPerch = ParrotPerchManager.createParrotPerchItemStack();
 		if( parrotPerch == null) {
 			logger.severe("Failed to create the parrot perch recipe");
 		} else {
@@ -201,7 +215,7 @@ public class SimpleShipsPlugin extends JavaPlugin {
 				logger.warning(String.format(msg, args));
 			}
 		} catch(Exception ex) {
-			logger.severe("Exception writing log: " + ex.getMessage());
+			logger.log(Level.SEVERE, "Exception generating log message", ex);
 		}
 	}
 	
@@ -219,8 +233,9 @@ public class SimpleShipsPlugin extends JavaPlugin {
 			}
 
 		} catch(Exception ex) {
-			logger.severe("Exception writing log to player: " + ex.getMessage());
+			logger.log(Level.SEVERE, "Exception generating log message", ex);
 			player.sendMessage("Exception writing log to player: " + ex.getMessage());
+
 		}
 	}
 

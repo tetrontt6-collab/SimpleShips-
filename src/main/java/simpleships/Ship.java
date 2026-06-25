@@ -612,6 +612,13 @@ public class Ship {
 		for(ArmorStandHandle ash : armorStands) {
 			ash.restore(helmLoc, finalYaw);
 		}
+		for(EntityPadHandle eph : entityPads) {
+			eph.restore(helmLoc, finalYaw);
+		}
+		for(PassengerSeatHandle psh : passengerSeats) {
+			psh.restore(helmLoc, finalYaw);
+		}
+		
 		for(DisplayEntityHandle deh : otherDisplayEntities ) {
 			deh.restore(helmLoc, finalYaw);
 		}
@@ -661,12 +668,10 @@ public class Ship {
 
 	private void moveAllComponents(Location loc) {
 		for(EntityPadHandle eph : entityPads) {
-			Location componentLocation = eph.pad.getPadLocation(loc, eph.offset, this.shipYaw);
-			eph.move(componentLocation);
+			eph.move(loc, this.shipYaw);
 		}
 		for(PassengerSeatHandle psh : passengerSeats) {
-			Location componentLocation = psh.seat.getSeatLocation(loc, psh.offset, this.shipYaw);
-			psh.move(componentLocation);
+			psh.move(loc, this.shipYaw);
 		}
 		for(ParrotPerchHandle pph : parrotPerchs) {
 			pph.move(loc, this.shipYaw);
@@ -1361,39 +1366,17 @@ public class Ship {
 	private boolean isHelmStand(ArmorStand stand) {
 		return stand.getUniqueId().equals(helmAnchor.getUniqueId());
 	}
-	private void captureEntityPad(Location standLoc, ArmorStand stand) {
-		LOG(0,"Found enitity pad at (%f,%f,%f)", standLoc.getX(), standLoc.getY(), standLoc.getZ());
-		EntityPad pad = EntityManager.getEntityPad(stand.getPersistentDataContainer().get(Constants.ENTITY_PAD_ID_KEY, PersistentDataType.STRING));
-		if( pad != null ) {
-			Vector3f worldOffset = new Vector3f((float)-(standLoc.getX() - helmAnchor.getX()),
-																					(float)((standLoc.getY() + EntityPad.V_OFFSET) - helmAnchor.getY()),
-																					(float)(standLoc.getZ() - helmAnchor.getZ()));
-			Quaternionf inverseShipRotation = new Quaternionf().rotateY((float)Math.toRadians(-shipYawAtAssemble));
-			Vector3f localOffset = new Vector3f(worldOffset);
-			inverseShipRotation.transform(localOffset);
-			entityPads.add(new EntityPadHandle(pad, localOffset));
-		}
+	private void captureEntityPad(CompositeDisplay cd, Location anchor, float shipYawAtAssemble) {
+		EntityPad pad = new EntityPad(cd);
+		entityPads.add(new EntityPadHandle(pad, anchor, shipYawAtAssemble));
 	}
-	private void captureParrotPerch(Location standLoc, ArmorStand stand) {
-		LOG(0,"Found enitity perch at (%f,%f,%f)", standLoc.getX(), standLoc.getY(), standLoc.getZ());
-		ParrotPerch perch = EntityManager.getParrotPerch(stand.getPersistentDataContainer().get(Constants.PARROT_PERCH_ID_KEY, PersistentDataType.STRING));
-		if( perch != null ) {
-			parrotPerchs.add(new ParrotPerchHandle(perch, helmAnchor.getLocation(), shipYawAtAssemble));
-		}
+	private void captureParrotPerch(CompositeDisplay cd,Location anchor, float shipYawAtAssemble) {
+		ParrotPerch perch = new ParrotPerch(cd);
+		parrotPerchs.add(new ParrotPerchHandle(perch, anchor, shipYawAtAssemble));
 	}
-	private void capturePassengerSeat(Location standLoc, ArmorStand stand) {
-		LOG(0,"Found passenger seat at (%f,%f,%f)", standLoc.getX(), standLoc.getY(), standLoc.getZ());
-		PassengerSeat pseat = EntityManager.getPassengerSeat(stand.getPersistentDataContainer().get(Constants.PASSENGER_SEAT_ID_KEY, PersistentDataType.STRING));
-		if( pseat != null ) {
-			Vector3f worldOffset = new Vector3f((float)-(standLoc.getX() - helmAnchor.getX()),
-																					(float)((standLoc.getY() + PassengerSeat.V_OFFSET) - helmAnchor.getY()),
-																					(float)(standLoc.getZ() - helmAnchor.getZ()));
-			Quaternionf inverseShipRotation = new Quaternionf().rotateY((float)Math.toRadians(-shipYawAtAssemble));
-			Vector3f localOffset = new Vector3f(worldOffset);
-			inverseShipRotation.transform(localOffset);
-			pseat.setAssembleYaw(shipYawAtAssemble);
-			passengerSeats.add(new PassengerSeatHandle(pseat, localOffset));
-		}
+	private void capturePassengerSeat(CompositeDisplay cd, Location anchor, float shipYawAtAssemble) {
+		PassengerSeat seat = new PassengerSeat(cd);
+		passengerSeats.add(new PassengerSeatHandle(seat, anchor, shipYawAtAssemble));
 	}
 	private void findAllEntitiesInBounds(HashSet<Vector3i> blocksInShip) {
 		Location anchor = helmAnchor.getLocation();
@@ -1417,27 +1400,40 @@ public class Ship {
 																		 (float)(eloc.getY() - anchor.getY()),
 																		 (float)(eloc.getZ() - anchor.getZ()));
 
+
+			if( entity instanceof Interaction inter) {
+				if(Constants.isShipComponent(inter)) {
+					CompositeDisplay cd = CompositeDisplay.reconstituteFromInteraction(Constants.ENTITY_PAD_ITEM_TYPE, inter);
+					if( cd != null ) {
+						captureEntityPad(cd, anchor, shipYawAtAssemble);
+						continue;
+					}
+					cd = CompositeDisplay.reconstituteFromInteraction(Constants.PASSENGER_SEAT_ITEM_TYPE, inter);
+					if( cd != null ) {
+						capturePassengerSeat(cd, anchor, shipYawAtAssemble);
+						continue;
+					}
+					cd = CompositeDisplay.reconstituteFromInteraction(Constants.PARROT_PERCH_ITEM_TYPE, inter);
+					if( cd != null ) {
+						captureParrotPerch(cd, anchor, shipYawAtAssemble);
+						continue;
+					}
+					
+				}
+			}
 			if( entity instanceof ArmorStand stand) {
-				LOG(0,"Entity is an armor stand");
 				if(isHelmStand(stand) ) {
-					LOG(0,"Helm Stand");
 					continue;
 				}
-				if(EntityPad.isEntityPadPost(stand)) {
-					LOG(0,"Entity pad");
-					captureEntityPad(eloc,stand);
+				if( CompositeDisplay.isCompositeDisplayEntity(Constants.PARROT_PERCH_ITEM_TYPE, entity)) {
 					continue;
 				}
-				if(ParrotPerch.isParrotPerch(stand)) {
-					LOG(0,"Parrot perch");
-					captureParrotPerch(eloc, stand);
-				}
-				if(PassengerSeat.isPassengerSeat(stand)) {
-					LOG(0,"Passenger Seat");
-					capturePassengerSeat(eloc, stand);
+				if( CompositeDisplay.isCompositeDisplayEntity(Constants.ENTITY_PAD_ITEM_TYPE, entity)) {
 					continue;
 				}
-				LOG(0,"ArmorStand at(%f,%f,%f) is not a ship compoment, capturing", eloc.getX(), eloc.getY(), eloc.getZ());
+				if( CompositeDisplay.isCompositeDisplayEntity(Constants.PASSENGER_SEAT_ITEM_TYPE, entity)) {
+					continue;
+				}
 				armorStands.add(new ArmorStandHandle(stand, anchor, shipYawAtAssemble));
 			}
 			if(Constants.isShipComponent(entity)) {
@@ -1461,10 +1457,11 @@ public class Ship {
 				}
 			} else if( entity instanceof Interaction interaction ) {
 				//used by some decoration data packs
-				if(EntityPad.isEntityPadInteraction(interaction)) {
-					continue;
-				}
-				interactions.add(new InteractionHandle(interaction, anchor, shipYawAtAssemble));
+				CompositeDisplay cd = CompositeDisplay.reconstituteFromInteraction(Constants.ENTITY_PAD_ITEM_TYPE, interaction);
+				if( cd != null )
+					captureEntityPad(cd, anchor, shipYawAtAssemble);
+				else
+					interactions.add(new InteractionHandle(interaction, anchor, shipYawAtAssemble));
 			} else {
 				LOG(0,"Entity is un-supported: %s %s", entity.getType().name(), entity.getName());
 			}

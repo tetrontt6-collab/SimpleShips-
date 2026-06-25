@@ -35,6 +35,18 @@ import org.joml.Vector3f;
 
 import static simpleships.SimpleShipsPlugin.LOG;
 
+/**
+ * The root of a CompositeDisplay is the {@link spigot.org.bukkit.entity.Interaction}, all
+ * other Display and ArmorStand entities are organized around this.
+ *
+ * One interesting note regarding the {@link spigot.org.bukkit.entity.Interaction} is that the location
+ * always resets the yaw and pitch to 0, regardless of what is passed into it.
+ *
+ * Our CompositeDisplay needs to maintain the proper values for those in the default location so they
+ * are being included in the persistent data of the parts (including the Interaction) so that when
+ * reconsituting a ComponentDisplay from a discovered {@link spigot.org.bukkit.entity.Interaction} the
+ * information is restored correctly.
+ */
 public class CompositeDisplay implements ICompositeDisplayHolder {
 	final static double SEARCH_LIMIT_X = 5;
 	final static double SEARCH_LIMIT_Y = 5;
@@ -48,7 +60,8 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 	double interactionHeight;
 	Location location;
 	Interaction interaction;
-	ArmorStand armorStand;
+	ArmorStandPart armorStandPart;
+
 	List<DisplayPart> parts = new ArrayList<>();
 	List<KeyData> keyData = new ArrayList<>();
 	String compositeDisplayType;
@@ -59,29 +72,61 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 		this.uniqueId = UUID.randomUUID().toString();
 		this.persistent = persistent;
 		this.location = loc.clone();
-		this.location.setYaw(0);
-		this.location.setPitch(0);
 		this.interactionWidth = interactionWidth;
 		this.interactionHeight = interactionHeight;
 		this.compositeDisplayType = compositeDisplayType;
 	}
 
-	private CompositeDisplay(String uniqueId, String compositeDisplayType, Interaction interaction, List<Display> displays) {
+	private CompositeDisplay(String uniqueId, String compositeDisplayType, Location loc, Interaction interaction, List<Display> displays) {
 		this.uniqueId = uniqueId;
 		this.compositeDisplayType = compositeDisplayType;
-		this.location = interaction.getLocation().clone();
+		this.location = loc.clone();
 		this.interactionWidth = interaction.getWidth();
 		this.interactionHeight = interaction.getHeight();
 		this.persistent = interaction.isPersistent();
 		this.interaction = interaction;
 		this.spawned = true;
 
-
 		for(Display display : displays) {
 			parts.add(new DisplayPart(display));
 		}
 	}
 
+	public void showInfo() {
+		if( interaction == null ) {
+		LOG(0,"CompositeDisplay '%s': loc(%f,%f,%f) %f, inter(%f,%f,%f) %f  %s",
+				compositeDisplayType,
+				location.getX(), location.getY(), location.getZ(), location.getYaw(),
+				0f, 0f, 0f, 0f, uniqueId);
+		} else {
+			Location l = interaction.getLocation();
+			LOG(0,"CompositeDisplay '%s': loc(%f,%f,%f) %f, inter(%f,%f,%f) %f  %s",
+					compositeDisplayType,
+					location.getX(), location.getY(), location.getZ(), location.getYaw(),
+					l.getX(), l.getY(), l.getZ(), l.getYaw(), uniqueId);
+		}
+	}
+
+
+	public int getNumberOfComponents() {
+		int count = 1;  //interaction
+
+		count += (armorStandPart != null ? 1 : 0);
+		count += parts.size();
+		return count;
+	}
+	
+	public String getId() {
+		return this.uniqueId;
+	}
+	
+	//distinct from the composite display id,
+	//this allows locating the interaction entity
+	//in the world if needed
+	public String getInteractionId() {
+		return this.interaction.getUniqueId().toString();
+	}
+	
 	public Location getLocation() {
 		return this.location;
 	}
@@ -111,14 +156,6 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 		this.interaction.getPersistentDataContainer().set(Constants.SS_CD_IS_ACTIVE_KEY, PersistentDataType.BOOLEAN, f);
 		return this;
 	}
-	
-	public String getInteractionId() {
-		if( interaction == null )
-			return null;
-
-		return interaction.getUniqueId().toString();
-	}
-
 	public boolean isSpawned() {
 		return this.spawned;
 	}
@@ -131,8 +168,7 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 			remove();
 		}
 		
-		
-		this.interaction = this.location.getWorld().spawn(this.location, Interaction.class, it-> {
+		this.interaction = this.location.getWorld().spawn(this.location.clone(), Interaction.class, it-> {
 				it.setPersistent(this.persistent);
 				it.setGravity(false);
 				it.setInteractionHeight((float)this.interactionHeight);
@@ -140,33 +176,75 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 				it.setResponsive(true);
 			});
 		addKeys(this.interaction);
+		this.interaction.getPersistentDataContainer().set(Constants.SS_CD_YAW_VALUE, PersistentDataType.FLOAT, location.getYaw());
+		this.interaction.getPersistentDataContainer().set(Constants.SS_CD_PITCH_VALUE, PersistentDataType.FLOAT, location.getPitch());
 
 		for(DisplayPart part : parts ) {
-			part.spawn(this.location, this.persistent);
+			part.spawn(this.location.clone(), this.persistent);
 			addKeys(part.getEntity());
 		}
 
-		if(armorStand != null )
-			addKeys(armorStand);
+		if(armorStandPart != null ) {
+			armorStandPart.spawn(this.location.clone(), this.persistent);
+			addKeys(armorStandPart.getStand());
+		}
 
 		spawned = true;
 		return this;
 	}
 
-	public CompositeDisplay addArmorStand(Location loc, boolean visible, boolean small) {
-		this.armorStand = loc.getWorld().spawn(loc, ArmorStand.class, as -> {
-				as.setPersistent(this.persistent);
-				as.setGravity(false);
-				as.setSmall(small);
-				as.setMarker(false);
-				as.setInvisible(!visible);
-			});
+	public CompositeDisplay addArmorStand(Vector3f offset, boolean visible, boolean small, float yaw) {
+		if(this.armorStandPart != null)
+			this.armorStandPart.remove();
+
+//		LOG(0,"adding armor stand at (%f,%f,%f) %f to cd %s", offset.x, offset.y, offset.z, yaw, uniqueId);
+		this.armorStandPart = new ArmorStandPart(offset, visible, small);
 		return this;
 	}
 
+	public CompositeDisplay setArmorStand(ArmorStand stand) {
+		if( this.armorStandPart != null )
+			this.armorStandPart.remove();
+		
+		Location standLoc = stand.getLocation();
+		Vector3f offset = new Vector3f((float)(standLoc.getX() - location.getX()),
+																	 (float)(standLoc.getY() - location.getY()),
+																	 (float)(standLoc.getZ() - location.getZ()));
+//		LOG(0,"setting armor stand at (%f,%f,%f) %f to cd %s", offset.x, offset.y, offset.z, standLoc.getYaw(), uniqueId);
+		this.armorStandPart = new ArmorStandPart(offset, stand);
+		return this;
+	}
+
+	public boolean hasPassenger() {
+		if( armorStandPart != null &&
+				armorStandPart.getStand().getPassengers() != null &&
+				armorStandPart.getStand().getPassengers().size() > 0 )
+			return true;
+		return false;
+	}
+
+	public Entity getPassenger() {
+		if( hasPassenger() ) {
+			return armorStandPart.getStand().getPassengers().get(0);
+		}
+		return null;
+	}
+
 	public CompositeDisplay mountPassenger(Entity entity) {
-		if( armorStand != null && armorStand.isEmpty() ) {
-			armorStand.addPassenger(entity);
+		if( armorStandPart != null && armorStandPart.getStand().isEmpty() ) {
+//			LOG(0,"Mounting entity on composite display %s", uniqueId);
+			entity.getPersistentDataContainer().set(Constants.SS_CD_INTERACTION_ID, PersistentDataType.STRING, getInteractionId());
+			armorStandPart.getStand().addPassenger(entity);
+		}
+		return this;
+	}
+
+	public CompositeDisplay removePassengers() {
+		if( armorStandPart != null && !armorStandPart.getStand().isEmpty()) {
+			for(Entity entity : armorStandPart.getStand().getPassengers()) {
+				entity.getPersistentDataContainer().remove(Constants.SS_CD_INTERACTION_ID);
+			}
+			armorStandPart.getStand().eject();
 		}
 		return this;
 	}
@@ -205,22 +283,27 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 
 	public void moveTo(Location loc) {
 		this.location = loc.clone();
-		this.location.setYaw(0);
 		this.location.setPitch(0);
-		if( interaction != null )
-			this.interaction.teleport(this.location);
-		for(DisplayPart display : parts ) {
-			display.moveTo(this.location);
+		
+		if( interaction != null ) {
+			this.interaction.teleport(this.location.clone());
+			
+			this.interaction.getPersistentDataContainer().set(Constants.SS_CD_YAW_VALUE, PersistentDataType.FLOAT, location.getYaw());
+			this.interaction.getPersistentDataContainer().set(Constants.SS_CD_PITCH_VALUE, PersistentDataType.FLOAT, location.getPitch());
 		}
-		if( armorStand != null )
-			armorStand.teleport(this.location);
+		for(DisplayPart display : parts ) {
+			display.moveTo(this.location.clone());
+		}
+
+		if( armorStandPart != null )
+			armorStandPart.moveTo(this.location.clone());
 		
 	}
 
 	public void remove() {
-		if( armorStand != null ) {
-			armorStand.eject();
-			armorStand.remove();
+		if( armorStandPart != null && armorStandPart.getStand() != null) {
+			armorStandPart.getStand().eject();
+			armorStandPart.getStand().remove();
 		}
 		
 		if( interaction != null ) {
@@ -265,7 +348,22 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 
 
 		Location center = interaction.getLocation();
+		Float yaw = interaction.getPersistentDataContainer().get(Constants.SS_CD_YAW_VALUE, PersistentDataType.FLOAT);
+		if( yaw == null ) {
+			yaw = 0.0f;
+		}
+
+		Float pitch = interaction.getPersistentDataContainer().get(Constants.SS_CD_PITCH_VALUE, PersistentDataType.FLOAT);
+		if( pitch == null ) {
+			pitch = 0.0f;
+		}
+		
+		center.setYaw(yaw);
+		center.setPitch(pitch);
+
 		World world = interaction.getWorld();
+
+		
 
 		// TODO for now all composite displays are kept withing a 1x1x1 bounding
 		// region, a single block. that could change but we'll limit our search
@@ -274,6 +372,7 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 																			center.getBlockX() + SEARCH_LIMIT_X, center.getBlockY() + SEARCH_LIMIT_Y, center.getBlockZ() + SEARCH_LIMIT_Z);
 
 		List<Display> foundDisplayEntities = new ArrayList<>();
+		ArmorStand foundArmorStand = null;
 		for(Entity entity : world.getNearbyEntities(box) ) {
 			if( entity instanceof Display display) {
 				if(isCompositeDisplayEntity(compositeDisplayType, display)) {
@@ -282,10 +381,19 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 						foundDisplayEntities.add(display);
 					}
 				}
+			} else if(entity instanceof ArmorStand stand) {
+				if( isCompositeDisplayEntity(compositeDisplayType, stand)) {
+					String id = getCompositeDisplayUniqueId(stand);
+					if( uniqueId.equals(id)) {
+						foundArmorStand = stand;
+					}
+				}
 			}
 		}
 
-		CompositeDisplay cd = new CompositeDisplay(uniqueId, compositeDisplayType, interaction, foundDisplayEntities);
+		CompositeDisplay cd = new CompositeDisplay(uniqueId, compositeDisplayType, center, interaction, foundDisplayEntities);
+		if( foundArmorStand != null )
+			cd.setArmorStand(foundArmorStand);
 		return cd;
 	}
 
@@ -342,8 +450,9 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 		}
 
 		void moveTo(Location loc) {
-			if(this.display != null)
+			if(this.display != null) {
 				this.display.teleport(loc);
+			}
 		}
 		void remove() {
 			if(this.display != null )
@@ -361,6 +470,8 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 				spawnBlock(location, persistent);
 			else
 				spawnItem(location, persistent);
+//			LOG(0,"CP_DP: %s spawn at (%f,%f,%f) %f", mat.toString(), location.getX(), location.getY(),location.getZ(), location.getYaw());
+
 		}
 
 		private void spawnBlock(Location location, boolean persistent) {
@@ -370,6 +481,11 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 			xform.rotateZ((float)Math.toRadians(rot.z));
 			xform.translate(pos);
 			xform.scale(scale);
+
+			// LOG(0,"spawnBlock: P(%f,%f,%f), R(%f,%f,%f), S(%f,%f,%f)",
+			// 		pos.x, pos.y, pos.z,
+			// 		rot.x, rot.y, rot.z,
+			// 		scale.x, scale.y, scale.z);
 
 			BlockData data = Bukkit.createBlockData(mat);
 
@@ -412,6 +528,59 @@ public class CompositeDisplay implements ICompositeDisplayHolder {
 			}
 		}
 	}
+
+	static class ArmorStandPart {
+		private Vector3f offset;
+		private boolean visible;
+		private boolean small;
+		private ArmorStand stand;
+		
+		ArmorStandPart(Vector3f offset, boolean visible, boolean small) {
+			this.offset = new Vector3f(offset);
+			this.visible = visible;
+			this.small = small;
+//			LOG(0,"Armor stand created at offset (%f,%f,%f)", offset.x, offset.y, offset.z);
+		}
+		ArmorStandPart(Vector3f offset, ArmorStand stand) {
+			this.offset = new Vector3f(offset);
+			this.visible = stand.isVisible();
+			this.small = stand.isSmall();
+			this.stand = stand;
+//			LOG(0,"Armor stand added at offset (%f,%f,%f)", offset.x, offset.y, offset.z);
+		}
+
+		public ArmorStand getStand() {
+			return this.stand;
+		}
+
+		public void spawn(Location loc, boolean persistent) {
+			remove();
+			Location standLoc = loc.clone().add(offset.x, offset.y, offset.z);
+			//		LOG(0,"Armor stand spawned at offset (%f,%f,%f) %f", standLoc.getX(), standLoc.getY(), standLoc.getZ(), standLoc.getYaw());
+			this.stand = loc.getWorld().spawn(standLoc, ArmorStand.class, as -> {
+				as.setPersistent(persistent);
+				as.setGravity(false);
+				as.setSmall(this.small);
+				as.setMarker(false);
+				as.setInvisible(!this.visible);
+			});
+		}
+
+		public void remove() {
+			if( this.stand != null )
+				this.stand.remove();
+			this.stand = null;
+		}
+
+		public void moveTo(Location loc) {
+			if( this.stand != null ) {
+				Location standLoc = loc.clone().add(offset.x, offset.y, offset.z);
+				this.stand.teleport(standLoc);
+			}
+		}
+	}
+		
+		
 
 	static class KeyData {
 		private NamespacedKey key;
