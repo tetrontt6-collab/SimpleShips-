@@ -1,394 +1,162 @@
-# SimpleShips
+First of all, thank you for offering free plugin development to help people. I genuinely appreciate it, and I think it's really cool that you're willing to spend your time helping server owners and developers with their projects.
 
-<p align="center">
-	<img src="screenshots/VikingLongShip.png" width="500">
-</p>
+I have a project that I think is relatively simple compared to building an entire plugin from scratch, because most of the source code already exists and I've already made some modifications myself (with a lot of AI assistance, since I'm not very experienced with Java plugin development).
 
+The project is based on this plugin:
 
+"https://share.google/t0liAznSS9dJfidvK" 
 
-> Smooth, survival-friendly sailing ships for modern Minecraft servers.
+It's an open-source plugin from Modrinth called SimpleShips. It allows players to build ships and then move them around as entities.
 
-SimpleShips is a lightweight Paper plugin that allows players to build and sail their own ships using ordinary Minecraft blocks.
+My goal is to turn it into a naval warfare system with cannons, ship HP, sinking mechanics, and ship storage.
 
-No client mods. No resource packs. No physics simulation.
+With AI assistance I've already managed to implement or partially implement several features:
 
-Build a ship, place a helm, gather your crew, and set sail.
+- Captain recognition (only the player who placed the helm can pilot the ship).
+- Permission-based ship size limits.
+- Some work toward ship HP and damage systems.
+- Some work toward ship sinking and ship storage.
 
----
+For the sinking system, my idea is that when a ship reaches 0 HP, it gets removed and saved. The owner can later recover it or permanently delete it.
 
-## Features
+I also added a custom command hook that executes:
 
-* Smooth ship movement using modern Display Entity APIs
-* No client mods required
-* Multiplayer friendly
-* Survival-friendly recipes
-* Passenger seats for other players
-* Entity pads for animals and villagers
-* Dedicated parrot perches
-* Moving respawn points for shipboard beds
-* Collision detection while sailing
-* Reverse movement to help maneuver out of tight spaces
-* Ship persistence across chunk loads and server restarts
-* Lightweight implementation using supported Paper APIs only
+Ir0Qv4nt540f383
 
+when a ship sinks.
 
-### Supported Decorative Features
+This isn't meant to be a real command players use. It's simply a coded event hook that I can later integrate with other systems. For example:
 
-SimpleShips preserves many decorative elements while ships are materialized:
+- Counting how many times a player has been sunk.
+- Statistics.
+- Quests.
+- Achievements.
+- Economy rewards.
+- Anything else I might want to connect later.
 
-* Banners and their patterns
-* Hanging banners
-* Signs
-* Hanging signs
-* Player heads and skulls
-* Item frames and glow item frames
-* Armor stands
-* Chests and double chests
-* Barrels
-* Furnaces
-* Beds
-* Campfires
-* Light sources
-* Shelves
-* Chiseled Bookshelves
+One important detail: this command should be executed by the captain/player who owned the ship, not by the console.
+ㅤ
+One major issue with ships turning into entities while moving is that players tend to slip off or fall right through them.
 
-Inventories and most block state information are restored automatically when ships disassemble.
+​- Relative Ship Movement: I need a system ensuring that if a player is standing on a ship while it is in motion, they move along with it automatically.
 
-### Death Chest Compatibility
+​- Freedom of Movement: Even if they are just standing up normally (not explicitly riding or sitting on an entity), the ship should carry them with it. From the player's perspective, they should be able to freely walk around the deck while the ship is actively moving across the water without falling off.
 
-When a ship rematerializes after the pilot dies, SimpleShips will not overwrite a container found at the helm/root block location.
+(possibly, make this option disableable via config)
 
-This is intended to improve compatibility with death chest and grave-style plugins or datapacks, which often place a recovery container at the player's death location.
+There are also planned effects after sinking (blindness and similar things), but I haven't been able to properly test any of that because the actual ship damage system never worked correctly.
 
-In this situation, the recovery container is preserved and the ship may be restored with one missing block near the helm.
+Because of that, everything that is supposed to happen after a ship reaches 0 HP may need to be reviewed. I simply never managed to get a ship to actually sink through combat, so I couldn't fully test the entire flow.
 
----
+The main thing I need help with is the cannon and damage system.
 
-## Living Aboard Your Ship
+My idea is:
 
-SimpleShips is designed to support long-term exploration and life at sea.  Beds, storage, companions, and many decorative elements can travel with your ship, allowing vessels to become true mobile homes.
+Every dispenser placed on a ship should be treated as a cannon.
 
-### Moving Respawn Points
+When the captain is sitting at the helm and left-clicks, every loaded dispenser on the ship fires simultaneously.
 
-If a player sets their respawn point using a bed aboard a ship, SimpleShips will automatically move that respawn point when the ship rematerializes.
+Each shot should consume 1 Fire Charge from the dispenser.
 
-This allows captains and passengers to treat their vessel as a true mobile home. If disaster strikes while exploring distant oceans, players can respawn aboard their ship rather than returning to a distant land-based base.
+After firing, all ship cannons should enter a cooldown of 20 seconds.
 
-### Ship Companions
+If possible, I'd love this cooldown to be permission-based, similar to how the ship size permissions work. Something like:
 
-SimpleShips supports bringing companions along for the voyage.
+cannon.cooldown.X
 
-* Passenger Seats allow other players to travel aboard your vessel.
-* Entity Pads allow animals and villagers to travel safely while underway.
-* Parrot Perches provide a dedicated place for parrots to ride aboard ships.
+where X is the cooldown value.
 
-Whether you travel alone, with friends, or with a loyal crew of pets and companions, your ship can become a living part of your world.
+This part is optional if it would make things significantly more complicated.
 
----
+I would also like players to be able to manually fire individual cannons using a button attached directly to the dispenser.
 
-## Philosophy
+In that case the cooldown would always be 5 seconds and wouldn't need permissions.
+ㅤ
+For damage:
 
-SimpleShips is intentionally *not* a physics simulation.
+When a cannonball hits a ship:
 
-There are already fantastic projects in the Minecraft community focused on advanced engineering and physics-driven gameplay. SimpleShips takes a different approach:
+- TNT explosion particles should appear.
+- TNT explosion sounds should play.
+- No blocks should actually be destroyed.
+- No players or mobs should take damage.
+- Only ships should receive damage.
 
-* No buoyancy calculations
-* No weight systems
-* No power systems
-* No rigid body physics
-* No complicated setup
+When a ship gets hit, everyone onboard that ship should see a boss bar displaying the ship's HP.
 
-The goal is simple:
+The boss bar should disappear if there has been no combat activity for 7 seconds.
 
-> Build a ship and sail it through your world.
+The sinking system described above would then take over when HP reaches zero.
 
-SimpleShips focuses on atmosphere, exploration, creativity, and multiplayer adventures while remaining lightweight and easy to use.
+One thing I'm unsure about is how damage should be handled when a ship is not moving.
 
----
+When the captain stops piloting, SimpleShips reconstructs the ship back into normal blocks. While moving, the ship is essentially an entity structure, but when stationary it becomes a normal block structure again.
 
-## Requirements
+I'm not sure what the best approach would be for detecting and applying damage in that situation, so if you have a cleaner idea I'd be happy to hear it.
 
-* PaperMC 1.21.11+
-* Java 21+
+I would also love a command similar to:
 
-### Tested Versions
+/shipbottle
 
-* Paper 1.21.11
-* Paper 26.2.1
+If the player is the captain of a ship:
 
-SimpleShips uses supported Paper APIs only and does not rely on NMS or internal server classes.
+- The ship structure gets saved.
+- The ship is removed from the world.
+- The player receives a normal vanilla water bottle with a custom name/lore (something like "Ship in a Bottle").
 
----
+When the bottle is used in water with enough available space:
 
-## Installation
+- The saved ship is recreated.
+- Entities are NOT restored.
 
-1. Download the latest release
-2. Drop the jar into your server's `plugins/` directory
-3. Start or restart the server
-4. Build a ship, place a helm and begin sailing
+So things like:
 
----
+- Helms
+- Armor Stand decorations
+- Custom parrots
+- Mobs
+- Other entities
 
-## Configuration
+would simply not be included in the saved data.
 
-Currently the configuration file is limited to setting boundaries for assembled ships.
+The bottle itself becomes the ownership record.
 
-```yaml
-debug: false
+If the player loses the bottle, the ship is effectively lost.
 
-ship-size:
-  max-ship-blocks:  500
-  max-ship-x-width: 32
-  max-ship-height:  16
-  max-ship-z-width: 32
-```
+If another player obtains the bottle and uses it, that player can spawn the ship.
+ㅤ
+For HP balancing, my idea is that ship HP should scale based on the amount of blocks used to build the ship.
 
-By default, ships are limited to 500 blocks and the dimensions listed above.
+Large ships would naturally have more HP.
 
-Using a value of `-1` for any of these settings removes the limit.
+Small ships would have less HP.
 
-The `debug` parameter will cause extra messages to be generated in the server logs.
+Since SimpleShips already makes larger ships slower and smaller ships faster, I think this creates a nice balance where larger ships gain survivability instead of only looking better.
 
----
+The plugin already has systems that count ship blocks, so hopefully that information can be reused.
 
-## Ship Components
+For permissions, I'd also like something similar to:
 
-There are various components available for use with the ship, the primary being the **Helm**.
-To carry non-player living entities, there is the **Entity Pad**. To allow other players to travel aboard your vessel, there is the **Passenger Seat** and for avian companions, there is the **Parrot Perch**.
+ship.damage.X
 
-When placing the **Helm**, it is necessary to be facing in the direction considered to be the front of the
-ship as the direction the player is facing at the time of placement determines what direction is `forward`.
+to control damage values.
 
-All components can be picked up with a `sneak-left click`.
+And:
 
-To use the **Helm** or **Passenger Seat**, simply right-click and the player will mount. The moment a player mounts the
-**Helm** the ship is assembled into Display entities and any entities or players standing on the ship will
-fall through the ship, so make sure your companions and pets are seated before the captain takes the helm.
+ship.cannons.X
 
-The **Entity Pad** is used by simply right-clicking. It will scan the area around the pad for a nearby living entity (excluding players, armor stands, and water mobs) and mount that entity onto the pad.
+to control the maximum number of dispensers/cannons allowed on a ship.
 
-The **Parrot Perch** is a decorative ship component designed specifically for parrots. Right-click the perch while near a parrot 
-and it will take up residence aboard your vessel. Parrots remain attached while the ship is underway and travel with the vessel.
+I'm mainly interested in knowing:
 
+- Do you think this is feasible?
+- How difficult would you consider it?
+- Which parts are easy and which parts are difficult?
+- Roughly how long do you think it would take?
 
-Unmounting a **Helm** or **Passenger Seat** is the standard unmount option.
+Most importantly, a large portion of the groundwork is already done, so you wouldn't be starting from scratch.
 
-To detach the entity from the **Entity Pad** or **Parrot Perch**, `sneak-right click` on the entity or the pad.
+If you're interested, I can send the full source code along with all the modifications I've already made.
 
----
-
-## Crafting Recipes
-
-
-### Helm
-
-Used to pilot ships.  When placing the helm, the player needs to be facing
-in the direction considered the front of the ship as that will be considered
-the direction of movement.
-
-```text
-[][ Any Wooden Trapdoor ][]
-[][   Any Wooden Fence  ][]
-[][      Iron Ingot     ][]
-```
-
-### Passenger Seat
-
-Allows other players to ride aboard ships.
-
-```text
-[][    Any Carpet    ][]
-[][ Any Wooden Stair ][]
-[][    Iron Ingot    ][]
-```
-
-### Entity Pad
-
-Allows animals and villagers to travel aboard ships.
-
-```text
-[][      Hay Bale    ][]
-[][ Any Wooden Fence ][]
-[][    Iron Ingot    ][]
-```
-
-### Parrot Perch
-
-Allows parrots to travel in style aboard ships.
-
-```text
-[Stick][Stick][Stick]
-[     ][Stick][     ]
-[     ][Stick][     ]
-```
-
----
-
-## Controls
-
-| Key    | Action                           |
-| ------ | -------------------------------- |
-| W      | Move forward                     |
-| S      | Move backward                    |
-| A / D  | Turn ship                        |
-| Space  | Toggle auto-sail                 |
-| Sprint | Align ship to cardinal direction |
-| Sneak  | Dismount                         |
-
-
-When auto-sail is active, the ship will move forward at a steady pace and can be turned.  To halt the ship,
-simply press W/S or Space again.
-
----
-
-## Building Ships
-
-To create a ship:
-
-1. Build using normal Minecraft blocks
-2. Ensure at least part of the ship is touching water
-3. Place a helm somewhere on the vessel
-4. Right-click the helm to assemble and pilot the ship
-5. Upon dismount, the ship will align to the nearest cardinal direction and rematerialize.
-
-When assembled, the ship materializes into moving Display Entities while preserving the appearance of the original build.
-
----
-
-## Collision Handling
-
-SimpleShips performs collision detection while moving forward to help prevent ships from passing through terrain or structures.
-
-Reverse movement intentionally ignores collision checks.
-
-This behavior is a deliberate design choice intended to help players recover ships that become wedged in tight canals, docks, harbors, or other difficult navigation areas.
-
-While it is technically possible to misuse reverse movement to force ships into invalid locations, SimpleShips prioritizes gameplay recovery and ease of use over strict movement enforcement.
-
-Note that when the pilot dismounts, the ship rematerializes back into world blocks. Any intersecting blocks occupying the same space may be replaced during this process.
-
----
-## Commands
-
-| Command | Description |
-|---|---|
-| `/simpleshipsplugin:cleanup` | This will remove all ship component parts (helm/seat/pad) as an aid to cleaning up issues |
-| `/simpleshipsplugin:helm` | Gives the player a ship helm |
-| `/simpleshipsplugin:seat` | Gives the player a passenger seat |
-| `/simpleshipsplugin:pad` | Gives the player an entity pad |
-| `/simpleshipsplugin:perch` | Gives the player a parrot perch |
-| `/simpleshipsplugin:flush` | Forces all active ships to rematerialize |
-
-### Permissions
-```
-simpleships.cleanup.use:
-  description: Allow use of the cleanup command
-  default: op
-  
-simpleships.flush.use:
-  description: Allow use of the flush command
-  default: op
-  
-simpleships.helm.use:
-  description: Allow use of the helm spawn command
-  default: op
-  
-simpleships.seat.use:
-  description: Allow use of the seat spawn command
-  default: op
-  
-simpleships.pad.use:
-  description: Allow use of the pad spawn command
-  default: op
-  
-simpleships.perch.use:
-  description: Allow use of the perch spawn command
-  default: op
-```
-
-
----
-## Notes
-
-* Larger ships move more slowly than smaller ships
-* Very large ships may occasionally show minor visual interpolation gaps during movement
-* Reverse movement intentionally ignores collision checks to help ships escape tight spaces
-* Ships currently operate on water only
-
-
----
-### Waterline Note
-
-SimpleShips is designed for surface vessels.
-
-Ships with enclosed spaces below the waterline may leave or carry water in unexpected ways when materialized and restored. If you build submarine-style vessels or sealed underwater cabins, those spaces may flood.
-
-For best results, build ships as surface vessels with no enclosed dry rooms below the waterline.
-
----
-
-## Current Status
-
-SimpleShips has reached a 1.0 release, but the project is still actively developed and used in real survival gameplay.
-
-The plugin is fully playable and actively used in survival gameplay, but there may still be occasional edge cases or issues during chunk loading, server restart recovery, or unusual builds.
-
-Feedback, bug reports, and suggestions are welcome.
-
----
-
-## Screenshots and Videos
-
-<p align="center">
-	<img src="screenshots/VikingLongShip.png" width="700">
-</p>
-
-
-<p align="center">
-	<video src="https://github.com/user-attachments/assets/6aa976c3-8467-417c-b3c7-8de4ae4a63af" controls width="800"></video>
-</p>	
-
-<p align="center">
-	<em>
-		Viking Longship design by Minecraft builder ThorHammerhand
-	</em>
-</p>	
-
-
----
-
-## Inspiration
-
-SimpleShips would not exist without the amazing work done over the years by the Minecraft modding and plugin communities.
-
-Special appreciation goes to projects such as:
-
-* Archimedes' Ships
-* Davinci's Vessels
-* Movecraft
-* Valkyrien Skies
-* Create
-* Create Aeronautics
-
-These projects helped inspire the idea that player-built ships could become living parts of a Minecraft world.
-
----
-
-## License
-
-SimpleShips is licensed under the MIT License.
-
-See the [LICENSE](LICENSE) file for full details.
-
----
-
-## Final Thoughts
-
-SimpleShips began as a personal experiment exploring what modern Minecraft Display Entities could do.
-
-It turned into something far more fun than expected.
-
-If you build something cool with it, sail into adventure with friends, or simply enjoy watching a ship glide across the water at sunset, then the project has succeeded.
-
-Fair winds and following seas.
-
+Thank you again for offering your time and helping the community!
+ㅤ
