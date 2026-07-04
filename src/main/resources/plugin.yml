@@ -1,0 +1,54 @@
+main: ${PACKAGE}.${NAME}
+name: ${NAME}
+version: "${VERSION}"
+api-version: "1.21.11"
+author: mictali
+description: A Simple Ships plugin
+commands:
+  cleanup:
+    description: Remove all ship components parts
+    usage: "/simpleshipsplugin cleanup"
+    permission: simpleships.cleanup.use
+  helm:
+    description: Give player a helm
+    usage: "/simpleshipsplugin helm"
+    permission: simpleships.helm.use
+  pad:
+    description: Give player an entity pad
+    usage: "/simpleshipsplugin pad"
+    permission: simpleships.pad.use
+  seat:
+    description: Give player a passenger seat
+    usage: "/simpleshipsplugin seat"
+    permission: simpleships.seat.use
+  perch:
+    description: Give player a parrot perch
+    usage: "/simpleshipsplugin perch"
+    permission: simpleships.perch.use
+  flush:
+    description: Flush all ships and components
+    usage: "/simpleshipsplugin flush"
+    permission: simpleships.flush.use
+
+permissions:
+  simpleships.cleanup.use:
+    description: Allow use of the cleanup command
+    default: op
+  simpleships.flush.use:
+    description: Allow use of the flush command
+    default: op
+  simpleships.helm.use:
+    description: Allow use of the helm spawn command
+    default: op
+  simpleships.seat.use:
+    description: Allow use of the seat spawn command
+    default: op
+  simpleships.pad.use:
+    description: Allow use of the pad spawn command
+    default: op
+  simpleships.perch.use:
+    description: Allow use of the perch spawn command
+    default: op
+
+
+    
