@@ -1,0 +1,11 @@
+# A journey of 1,000 lines starts with a single char
+
+debug: false
+
+#this defines the max ship parameters
+#A value of -1 indicates no limit
+ship-size:
+  max-ship-blocks:  500
+  max-ship-x-width: 32
+  max-ship-height:  16
+  max-ship-z-width: 32
