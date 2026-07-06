@@ -156,7 +156,5 @@ I'm mainly interested in knowing:
 
 Most importantly, a large portion of the groundwork is already done, so you wouldn't be starting from scratch.
 
-If you're interested, I can send the full source code along with all the modifications I've already made.
-
 Thank you again for offering your time and helping the community!
 ㅤ
