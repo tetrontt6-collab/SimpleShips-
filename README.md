@@ -1,5 +1,3 @@
-First of all, thank you for offering free plugin development to help people. I genuinely appreciate it, and I think it's really cool that you're willing to spend your time helping server owners and developers with their projects.
-
 I have a project that I think is relatively simple compared to building an entire plugin from scratch, because most of the source code already exists and I've already made some modifications myself (with a lot of AI assistance, since I'm not very experienced with Java plugin development).
 
 The project is based on this plugin:
@@ -156,5 +154,3 @@ I'm mainly interested in knowing:
 
 Most importantly, a large portion of the groundwork is already done, so you wouldn't be starting from scratch.
 
-Thank you again for offering your time and helping the community!
-ㅤ
